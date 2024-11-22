@@ -20,13 +20,17 @@ class Movie(m.Model):
     director = m.CharField(max_length=255)
     cast = m.CharField(max_length=2500)
 
+    def __str__(self) -> str:
+        return f"ID: {self.id}; Title: {self.title}; Genre: {self.genre}."
+
 
 class Seat(m.Model):
     auditorium = m.IntegerField()
     row = m.CharField(max_length=1)
     column = m.IntegerField()
-    reservations = m.ManyToManyField("Reservation", blank=True, null=True)
 
+    def __str__(self) -> str:
+        return self.get_code()
 
     def is_available(self, showtime):
         for reservation in self.reservations:
@@ -35,15 +39,25 @@ class Seat(m.Model):
             
         return True
     
+    def get_code(self):
+        return f"A{self.auditorium} {self.row}{self.column}"
+    
 
 class Reservation(m.Model):
-    user = m.ForeignKey(User, related_name="reservations")
-    seat = m.ForeignKey(Seat, related_name="reservations")
-    showtime = m.ForeignKey("Showtime", related_name="reservations")
+    user = m.ForeignKey(User, related_name="reservations", on_delete=m.CASCADE)
+    showtime = m.ForeignKey("Showtime", related_name="reservations", on_delete=m.CASCADE)
+    seat = m.ForeignKey(Seat, related_name="reservations", on_delete=m.CASCADE, null=True)
+
+    def __str__(self) -> str:
+        return f"User: {self.user}; Showtime: {self.showtime.start}; Seat: {self.seat}"
 
 
 class Showtime(m.Model):
-    movie = m.ForeignKey(Movie, related_name="showtimes")
+    movie = m.ForeignKey(Movie, related_name="showtimes", on_delete=m.CASCADE)
+    auditorium = m.IntegerField()
     start = m.DateTimeField()
     end = m.DateTimeField()
     status = m.CharField(max_length=10, choices=SHOWTIME_STATUS)
+
+    def __str__(self) -> str:
+        return f"{self.movie.title}; {self.auditorium}; start={self.start.hour}:{self.start.minute}; end={self.end.hour}:{self.end.minute}"
