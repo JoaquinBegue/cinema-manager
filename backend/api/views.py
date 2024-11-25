@@ -1,3 +1,7 @@
+# Python stuff
+from datetime import datetime
+from random import choice
+
 # Django stuff
 from django.shortcuts import render
 from django.http import Http404
@@ -9,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 # API stuff
-from .models import Movie, Seat, Reservation, Showtime
+from .models import Movie, Seat, Reservation, Showtime, User
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer
 
 def index(request):
@@ -17,7 +21,7 @@ def index(request):
         return render(request, "api/index.html")
 
 
-class MovieListCreate(generics.ListAPIView):
+class MovieList(generics.ListAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
@@ -38,6 +42,7 @@ class ShowtimeListCreate(generics.ListAPIView):
 
 
 class MovieDetails(APIView):
+    """Returns data from the requested movie, such as movie info and the available showtimes."""
     def get_movie(self, pk):
         try:
             return Movie.objects.get(pk=pk)
@@ -53,9 +58,10 @@ class MovieDetails(APIView):
     
 
 class ShowtimeSeats(APIView):
+    """Returns all the seats for a requested showtime."""
     def get_showtime(self, pk):
         try:
-            return Showtime.objects.get(pk=pk)
+            return Showtime.objects.get(pk=pk, status="available")
         except Showtime.DoesNotExist:
             raise Http404
     
@@ -68,3 +74,42 @@ class ShowtimeSeats(APIView):
         seats_srl = SeatSerializer(seats, many=True, context={"showtime": showtime})
         return Response(data=(showtime_srl.data, seats_srl.data))
     
+
+class Reserve(APIView):
+    def get_showtime(self, pk, seats_amount):
+        try:
+            showtime = Showtime.objects.get(pk=pk)
+            if showtime.is_available(datetime.today(), seats_amount): return showtime
+            else: raise Http404
+            
+        except Showtime.DoesNotExist:
+            raise Http404
+
+    def get_seat(self, pk, showtime):
+        try:
+            seat = Seat.objects.get(pk=pk)
+            if seat.is_available(showtime): return seat
+            else: raise Http404
+
+        except Seat.DoesNotExist:
+            raise Http404
+
+    def post(self, request):
+        # Get the POST data.
+        seats = request.data["seats"]
+        showtime = request.data["showtime"]
+
+        # Get the showtime.
+        showtime = self.get_showtime(showtime, seats.count())
+
+        # Create the reservations.
+        reservations = []
+        ### TEMPORAL: Get a dummy user.
+        user = choice(User.objects.all())
+        for seat in seats:
+            s = self.get_seat(showtime)
+            r = Reservation(user=user, seat=s, showtime=showtime)
+            reservations.append(r)
+
+        # Once all reservations are successfully created, save them.
+        for r in reservations: r.save()

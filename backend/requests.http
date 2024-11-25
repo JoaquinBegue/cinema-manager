@@ -1,6 +1,17 @@
+### List reservations
+GET http://localhost:8000/api/reservations
 
 ### Get movie details
 GET http://localhost:8000/api/movie/2
 
 ### Get showtime seats
 GET http://localhost:8000/api/showtime/16
+
+### Execute a reservation
+POST http://localhost:8000/api/reserve
+content-type: application/json
+
+{
+    "showtime": 16,
+    "seats": [304, 305, 306]
+}
