@@ -6,9 +6,9 @@ MOVIE_GENRES = {
     }
 
 SHOWTIME_STATUS = {
-        "A": "AVAILABLE",
-        "F": "FULL",
-        "E": "EXPIRED"
+        "A": "Available",
+        "F": "Full",
+        "E": "Expired"
     }
 
 
@@ -33,7 +33,7 @@ class Seat(m.Model):
         return self.get_code()
 
     def is_available(self, showtime):
-        for reservation in self.reservations:
+        for reservation in self.reservations.all():
             if reservation.showtime == showtime:
                 return False
             

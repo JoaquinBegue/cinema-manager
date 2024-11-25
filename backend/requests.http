@@ -1,0 +1,6 @@
+
+### Get movie details
+GET http://localhost:8000/api/movie/2
+
+### Get showtime seats
+GET http://localhost:8000/api/showtime/16

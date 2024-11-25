@@ -10,9 +10,15 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 class SeatSerializer(serializers.ModelSerializer):
+    available = serializers.SerializerMethodField()
+
     class Meta:
         model = Seat
         fields = "__all__"
+
+    def get_available(self, obj):
+        showtime = self.context.get("showtime")
+        return obj.is_available(showtime) if showtime else None
 
 
 class ReservationSerializer(serializers.ModelSerializer):
