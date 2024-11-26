@@ -5,6 +5,7 @@ from random import choice
 # Django stuff
 from django.shortcuts import render
 from django.http import Http404
+from django.contrib.auth.models import AnonymousUser
 
 # DRF stuff
 from rest_framework import generics
@@ -13,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 # API stuff
-from .models import Movie, Seat, Reservation, Showtime, User
+from .models import Movie, Seat, Reservation, Showtime
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer
 
 def index(request):
@@ -105,7 +106,7 @@ class Reserve(APIView):
         # Create the reservations.
         reservations = []
         ### TEMPORAL: Get a dummy user.
-        user = choice(User.objects.all())
+        user = AnonymousUser()
         for seat in seats:
             s = self.get_seat(showtime)
             r = Reservation(user=user, seat=s, showtime=showtime)
