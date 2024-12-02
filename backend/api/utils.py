@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, AnonymousUser
+from django.utils import timezone
 from .models import *
 from datetime import datetime, timedelta
 from random import choice
@@ -57,7 +58,7 @@ def create_movies():
 # SHOWTIMES
 def create_showtimes(n, movie):
     showtimes = []
-    start = datetime(2024, 12, 1, 12)
+    start = timezone.make_aware(datetime(2024, 12, 15, 12)) 
     for showtime in range(n):
         end = start + timedelta(minutes=movie.duration) + timedelta(minutes=15)
         s = Showtime.objects.create(

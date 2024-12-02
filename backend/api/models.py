@@ -83,7 +83,7 @@ class Showtime(m.Model):
         if self.status != "available":
             return False
         
-        if datetime > self.start + timedelta(minutes=15):
+        if self.start + timedelta(minutes=15) < datetime:
             self.status = "expired"
             return False
 
