@@ -50,6 +50,10 @@ class MovieDetails(APIView):
         except Movie.DoesNotExist:
             raise Http404
     
+    def get_showtimes(self, movie):
+        showtimes = Showtime.objects.filter(movie=movie, status="available")
+        available_showtimes = [showtime for showtime in showtimes if showtime.is_available()]
+
     def get(self, request, pk, format=None):
         movie = self.get_movie(pk)
         showtimes = Showtime.objects.filter(movie=movie, status="available")
