@@ -52,7 +52,12 @@ class MovieDetails(APIView):
     
     def get_showtimes(self, movie):
         showtimes = Showtime.objects.filter(movie=movie, status="available")
-        available_showtimes = [showtime for showtime in showtimes if showtime.is_available()]
+        available_showtimes = [
+                showtime for showtime in showtimes
+                if showtime.is_available(timezone.now(), 0)
+        ]
+
+        return available_showtimes
 
     def get(self, request, pk, format=None):
         movie = self.get_movie(pk)
