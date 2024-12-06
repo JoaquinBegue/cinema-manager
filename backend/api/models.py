@@ -3,7 +3,9 @@ from django.db import models as m
 from django.contrib.auth.models import User
 
 MOVIE_GENRES = {
-    
+        "crime": "Crime",
+        "drama": "Drama",
+        "science fiction": "Science Fiction",
     }
 
 SHOWTIME_STATUS = {
@@ -16,6 +18,7 @@ SHOWTIME_STATUS = {
 # Create your models here.
 class Movie(m.Model):
     title = m.CharField(max_length=500)
+    poster = m.ImageField(default="default_poster.jpg" ,upload_to="images/posters/")
     genre = m.CharField(max_length=50, choices=MOVIE_GENRES)
     duration = m.IntegerField(verbose_name="duration in minutes")
     director = m.CharField(max_length=255)
