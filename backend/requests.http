@@ -1,17 +1,22 @@
-### List reservations
-GET http://localhost:8000/api/reservations
+### 1. Index / Get all movies:
+GET http://localhost:8000/api/movies
 
-### Get movie details
-GET http://localhost:8000/api/movie/2
+### 2. User selects a movie / Get movie details:
+GET http://localhost:8000/api/movie/1
 
-### Get showtime seats
-GET http://localhost:8000/api/showtime/16
+### 3. User selects a showtime / Get showtime seats:
+GET http://localhost:8000/api/showtime/41
 
-### Execute a reservation
-POST http://localhost:8000/api/reserve
+### 4. User selects the seats to reserve / Execute a reservation:
+POST http://localhost:8000/api/reserve/
 content-type: application/json
 
 {
-    "showtime": 16,
+    "showtime": 41,
     "seats": [304, 305, 306]
 }
+
+
+
+### List reservations
+GET http://localhost:8000/api/reservations

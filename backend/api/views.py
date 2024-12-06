@@ -5,16 +5,16 @@ from random import choice
 # Django stuff
 from django.shortcuts import render
 from django.http import Http404
-from django.contrib.auth.models import AnonymousUser
+from django.utils import timezone
 
 # DRF stuff
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 # API stuff
-from .models import Movie, Seat, Reservation, Showtime
+from .models import Movie, Seat, Reservation, Showtime, User
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer
 
 def index(request):
@@ -84,10 +84,13 @@ class Reserve(APIView):
     def get_showtime(self, pk, seats_amount):
         try:
             showtime = Showtime.objects.get(pk=pk)
-            if showtime.is_available(datetime.today(), seats_amount): return showtime
-            else: raise Http404
+            if showtime.is_available(timezone.now(), seats_amount): return showtime
+            else: 
+                print("Showtime not available", showtime.start)
+                raise Http404
             
         except Showtime.DoesNotExist:
+            print("Showtime.DoesNotExist")
             raise Http404
 
     def get_seat(self, pk, showtime):
@@ -97,6 +100,7 @@ class Reserve(APIView):
             else: raise Http404
 
         except Seat.DoesNotExist:
+            print("Seat.DoesNotExist")
             raise Http404
 
     def post(self, request):
@@ -105,16 +109,18 @@ class Reserve(APIView):
         showtime = request.data["showtime"]
 
         # Get the showtime.
-        showtime = self.get_showtime(showtime, seats.count())
+        showtime = self.get_showtime(showtime, len(seats))
 
         # Create the reservations.
         reservations = []
         ### TEMPORAL: Get a dummy user.
-        user = AnonymousUser()
+        user = choice(User.objects.all())
         for seat in seats:
-            s = self.get_seat(showtime)
+            s = self.get_seat(seat, showtime)
             r = Reservation(user=user, seat=s, showtime=showtime)
             reservations.append(r)
 
         # Once all reservations are successfully created, save them.
         for r in reservations: r.save()
+
+        return Response(status=status.HTTP_201_CREATED)
