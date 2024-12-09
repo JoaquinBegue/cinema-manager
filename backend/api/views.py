@@ -12,10 +12,11 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 # API stuff
 from .models import Movie, Seat, Reservation, Showtime, User
-from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer
+from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
 
 def index(request):
     if request.method == "GET":
@@ -86,6 +87,8 @@ class ShowtimeSeats(APIView):
     
 
 class Reserve(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get_showtime(self, pk, seats_amount):
         try:
             showtime = Showtime.objects.get(pk=pk)
@@ -129,3 +132,13 @@ class Reserve(APIView):
         for r in reservations: r.save()
 
         return Response(status=status.HTTP_201_CREATED)
+    
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
