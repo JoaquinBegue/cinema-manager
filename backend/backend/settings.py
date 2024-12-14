@@ -130,3 +130,7 @@ MEDIA_URL = 'media/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Changed Jazzmin's form fields html:
+# In "C:\projects\cinema-manager\venv\Lib\site-packages\jazzmin\templates\admin\includes\fieldset.html",
+# line 31, changed "col-sm-7" to "col-sm-9", to have more room in form fields.

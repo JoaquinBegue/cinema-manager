@@ -19,8 +19,11 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from api.admin import cinema_admin_site
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("cinema-admin/", cinema_admin_site.urls),
     path("", include("api.urls")),
     path("api/", include("api.urls")),
     path("auth/", include("rest_framework.urls"))
