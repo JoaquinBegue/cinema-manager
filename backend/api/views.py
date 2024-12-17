@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import AdminRenderer
 
 # API stuff
 from .models import Movie, Seat, Reservation, Showtime, User
@@ -142,3 +143,9 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class UserListAdmin(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    renderer_classes = [AdminRenderer]

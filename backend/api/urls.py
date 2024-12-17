@@ -15,4 +15,7 @@ urlpatterns = [
     path("movie/<int:pk>/", views.MovieDetails.as_view(), name="movie-details"),
     path("showtime/<int:pk>/", views.ShowtimeSeats.as_view(), name="showtime-seats"),
     path("reserve/", views.Reserve.as_view(), name="reserve"),
+
+    # Admin
+    path("admin/user-list/", views.UserListAdmin.as_view(), name="admin-user-list"),
 ]
