@@ -1,0 +1,11 @@
+{% extends 'api/layout.html' %}
+
+{% block content %}
+
+  {% for movie in movies %}
+  <div class="movie">
+    <a href="{% url 'movie-details-rendered' pk=movie.id %}">{{ movie.title }}</a>
+  </div>
+  {% endfor %}
+
+{% endblock %}

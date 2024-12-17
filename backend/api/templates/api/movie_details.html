@@ -1,0 +1,17 @@
+{% extends 'api/layout.html' %}
+
+{% block content %}
+
+  <div class="movie-details">
+    {{ movie }}
+  </div>
+
+  <div id="showtimes">
+    {% for showtime in showtimes %}
+    <div class="showtime">
+      {{ showtime }}
+    </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}

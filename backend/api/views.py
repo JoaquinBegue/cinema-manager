@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import AdminRenderer
+from rest_framework.renderers import TemplateHTMLRenderer
 
 # API stuff
 from .models import Movie, Seat, Reservation, Showtime, User
@@ -23,6 +23,8 @@ def index(request):
     if request.method == "GET":
         return render(request, "api/index.html")
 
+
+# Generics.
 
 class MovieList(generics.ListAPIView):
     queryset = Movie.objects.all()
@@ -43,6 +45,8 @@ class ShowtimeListCreate(generics.ListAPIView):
     queryset = Showtime.objects.all()
     serializer_class = ShowtimeSerializer
 
+
+# Custom.
 
 class MovieDetails(APIView):
     """Returns data from the requested movie, such as movie info and the available showtimes."""
@@ -145,7 +149,41 @@ class UserDetail(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UserListAdmin(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    renderer_classes = [AdminRenderer]
+# Rendered.
+
+class MovieListRendered(generics.ListAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get(self, request, *args, **kwargs):
+        self.movies = self.get_queryset()
+        return Response({'movies': self.movies}, template_name='api/movie_list.html')
+
+
+class MovieDetailsRendered(APIView):
+    """Returns data from the requested movie, such as movie info and the available showtimes."""
+
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get_movie(self, pk):
+        try:
+            return Movie.objects.get(pk=pk)
+        except Movie.DoesNotExist:
+            raise Http404
+    
+    def get_showtimes(self, movie):
+        showtimes = Showtime.objects.filter(movie=movie, status="available")
+        available_showtimes = [
+                showtime for showtime in showtimes
+                if showtime.is_available(timezone.now(), 0)
+        ]
+
+        return available_showtimes
+
+    def get(self, request, pk, format=None):
+        movie = self.get_movie(pk)
+        showtimes = Showtime.objects.filter(movie=movie, status="available")
+        movie_srl = MovieSerializer(movie)
+        showtimes_srl = ShowtimeSerializer(showtimes, many=True)
+        return Response({"movie": movie_srl.data, "showtimes": showtimes_srl.data}, template_name="api/movie_details.html")
