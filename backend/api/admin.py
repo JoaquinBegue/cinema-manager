@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, Group
 from .forms import CustomUserForm
 from .models import Movie, Seat, Reservation, Showtime
 
+
 class CinemaAdminSite(admin.AdminSite):
     """Admin site for cinema staff. This site provides Movies, Reservations and
     Showtimes management, along with a restricted User management."""
@@ -12,6 +13,7 @@ class CinemaAdminSite(admin.AdminSite):
     index_title = "Cinema"
     site_header = "Cinema Administration"
     site_title = "Administration"
+
 
 class CustomUserAdmin(DefaultUserAdmin):
     form = CustomUserForm
@@ -37,7 +39,11 @@ class CustomUserAdmin(DefaultUserAdmin):
         if request.user.groups.filter(name="admin").exists():
             return qs
         return qs.none()
-    
+
+
+class ShowtimeAdmin(admin.ModelAdmin):
+    list_display = ('movie', 'auditorium', 'start', 'status', 'get_revenue')
+
 
 # CinemaAdminSite model register.
 cinema_admin_site = CinemaAdminSite(name="cinema_admin_site")
@@ -45,7 +51,7 @@ cinema_admin_site.register(User, CustomUserAdmin)
 
 cinema_admin_site.register(Movie)
 cinema_admin_site.register(Reservation)
-cinema_admin_site.register(Showtime)
+cinema_admin_site.register(Showtime, ShowtimeAdmin)
 
 # Django admin site model register.
 admin.site.register(Movie)

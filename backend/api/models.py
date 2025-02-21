@@ -14,6 +14,7 @@ SHOWTIME_STATUS = {
         "E": "Expired"
     }
 
+MOVIE_TICKET_VALUE = 12
 
 # Create your models here.
 class Movie(m.Model):
@@ -25,7 +26,7 @@ class Movie(m.Model):
     cast = m.CharField(max_length=2500)
 
     def __str__(self) -> str:
-        return f"ID: {self.id}; Title: {self.title}; Genre: {self.genre}."
+        return f"ID: {self.id}; Title: {self.title}."
 
 
 class Seat(m.Model):
@@ -95,3 +96,10 @@ class Showtime(m.Model):
             return False
         
         return True
+    
+    def get_revenue(self):
+        """Returns the revenue for the requested showtime."""
+
+        return self.reservations.count() * MOVIE_TICKET_VALUE
+
+    get_revenue.short_description = "Revenue"

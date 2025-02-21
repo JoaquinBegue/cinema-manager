@@ -1,27 +1,57 @@
 # cinema-manager
-A practice project that emulates a cinema website, with users, movie management and reservations.
+A practice project that emulates a cinema website.<br>
+The app will allow users to sign up, log in, browse movies, reserve seats for specific showtimes, and manage their reservations. The system will feature user authentication, movie and showtime management, seat reservation functionality, and reporting on reservations.
 
-## Implementations
-Django and django REST framework.
-Postgres database.
-JWT for authentication.
+Technologies to apply:<br>
+- Django and django REST framework for backend.<br>
+- Postgres database.
+- JWT for authentication.
 
-## Website structure
+# Implementations
+The app consist of the following modules.
+- Admin site.
+- Movie browser page.
+- Movie details page.
+- Reservation system.
+- Reservation page.
+- Auth system.
 
-### Navbar:
-The navbar will let the users navigate to the main page, access login and register forms and search for movies.
-The login and register forms will be displayed from the navbar, avoiding using a whole page only to display a single form.
+## Admin site:
+This site should let the staff manage movies, showtimes, reservations, and users.
 
-### Main page / index:
-The main page will list all the available movies and let the users browse them.
-Clicking in a movie will lead the user to the specific movie page.
+- [x] Movie managent (CRUD).
+- [x] Showtime management (CRUD).
+- [x] Reservation management (CRUD).
+- [ ] User management (CRUD and role assignment).
 
-### Movie page:
-This will display some movie data and synopsis, along with the showtimes available for that movie.
-If the user is authenticated, it will be able to make a reservation for that movie.
+## Movie browser page:
+Index page. Here all the movies will be listed, letting the user search and filter the movies.
 
-### Reservations page:
-This page will list all the reservations a user has made, and let him cancel them.
+- [ ] Movie listing.
+- [ ] Search bar.
+- [ ] Category filtering.
+  
+## Movie details page:
+This is the page that displays the movie information and allows the user to make a reservation for a specific movie showtime.
+
+- [ ] Movie info display.
+- [ ] Showtimes display.
+- [ ] Reservation system display.
+
+## Reservation system:
+This system should allow the user to reserve seats for a specific showtime, keeping track of seat availability.
+- [ ] Reservation and availability management.
+
+## Reservation page:
+This page should allow the user to see all their reservations.
+
+- [ ] Reservation listing.
+
+## Auth system:
+The app should let the users register, login and logout. The users should be divided in two roles: staff and regular users, with different levels of authorization.
+
+- [ ] Register and login page.
+- [ ] Role assingment system.
 
 ## Data Scructure
 The data will be organized with the following models:
