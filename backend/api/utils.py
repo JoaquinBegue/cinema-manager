@@ -58,7 +58,7 @@ def create_movies():
 # SHOWTIMES
 def create_showtimes(n, movie):
     showtimes = []
-    start = timezone.make_aware(datetime(2024, 12, 15, 12)) 
+    start = timezone.make_aware(datetime(2025, 2, 20, 12)) 
     for showtime in range(n):
         end = start + timedelta(minutes=movie.duration) + timedelta(minutes=15)
         s = Showtime.objects.create(
@@ -121,3 +121,9 @@ def test():
     )
     for p in permissions.all():
         print(p)
+
+
+from api.models import Movie 
+from api.utils import create_showtimes
+m = Movie.objects.get(title="The Matrix")
+create_showtimes(4, m)

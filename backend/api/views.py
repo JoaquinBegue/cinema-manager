@@ -13,15 +13,18 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import AdminRenderer
+from rest_framework.renderers import AdminRenderer, TemplateHTMLRenderer
 
 # API stuff
 from .models import Movie, Seat, Reservation, Showtime, User
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
 
-def index(request):
-    if request.method == "GET":
-        return render(request, "api/index.html")
+class Index(generics.ListAPIView):
+    queryset = Movie.objects.all()
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get(self, request, *args, **kwargs):
+        return Response({"movies": self.get_queryset()}, template_name='api/index.html')
 
 
 class MovieList(generics.ListAPIView):
@@ -46,6 +49,8 @@ class ShowtimeListCreate(generics.ListAPIView):
 
 class MovieDetails(APIView):
     """Returns data from the requested movie, such as movie info and the available showtimes."""
+    renderer_classes = [TemplateHTMLRenderer]
+
     def get_movie(self, pk):
         try:
             return Movie.objects.get(pk=pk)
@@ -63,10 +68,12 @@ class MovieDetails(APIView):
 
     def get(self, request, pk, format=None):
         movie = self.get_movie(pk)
-        showtimes = Showtime.objects.filter(movie=movie, status="available")
-        movie_srl = MovieSerializer(movie)
-        showtimes_srl = ShowtimeSerializer(showtimes, many=True)
-        return Response(data=(movie_srl.data, showtimes_srl.data))
+        # TODO: Get showtimes through the get_showtimes method.
+        #showtimes = Showtime.objects.filter(movie=movie, status="available")
+        showtimes = self.get_showtimes(movie)
+        #movie_srl = MovieSerializer(movie)
+        #showtimes_srl = ShowtimeSerializer(showtimes, many=True)
+        return Response({"movie": movie, "showtimes":showtimes}, template_name='api/movie_details.html')
     
 
 class ShowtimeSeats(APIView):
@@ -88,7 +95,7 @@ class ShowtimeSeats(APIView):
     
 
 class Reserve(APIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     def get_showtime(self, pk, seats_amount):
         try:

@@ -5,7 +5,7 @@ GET http://localhost:8000/api/movies
 GET http://localhost:8000/api/movie/1
 
 ### 3. User selects a showtime / Get showtime seats:
-GET http://localhost:8000/api/showtime/41
+GET http://localhost:8000/api/showtime/35
 
 ### 4. User selects the seats to reserve / Execute a reservation:
 POST http://localhost:8000/api/reserve/

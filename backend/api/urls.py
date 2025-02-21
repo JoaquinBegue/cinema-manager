@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # Index
-    path("", views.index, name="index"),
+    path("", views.Index.as_view(), name="index"),
 
     # Generics
     path("movies/", views.MovieList.as_view(), name="movie-list"),

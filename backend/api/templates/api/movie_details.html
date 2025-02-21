@@ -1,0 +1,36 @@
+{% extends "api/layout.html" %}
+{% load static %}
+
+{% block extrahead %}
+    <link rel="stylesheet" href="{% static 'api/movie_details.css' %}">
+    <script src="{% static 'api/movie_details.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+    <h1>{{ movie.title }}</h1>
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/vKQi3bBA1y8?si=en5HjrU9zfIBrATi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+    <h3>Available showtimes:</h3>
+    <form>
+        {% for showtime in showtimes %}
+        <input type="radio" name="showtime" value="{{ showtime.id }}"
+        id="showtime_{{ showtime.id }}" required
+        onclick="showtimeSelected(this)">
+            {{ showtime.start }}
+        </input>
+        <br>
+        {% endfor %}
+    </form>
+
+    <div id="showtime-seats">
+        <h3>Showtime seats:</h3>
+        <table id="seats">
+            <tr id="row_A">
+                <td id="seat_A1">A1</td>
+            </tr>
+        </table>
+    </div>
+
+    <button type="button" onclick="reserveSeats()">Reserve</button>
+{% endblock %}

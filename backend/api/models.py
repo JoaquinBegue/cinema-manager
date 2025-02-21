@@ -76,7 +76,7 @@ class Showtime(m.Model):
     status = m.CharField(max_length=10, choices=SHOWTIME_STATUS)
 
     def __str__(self) -> str:
-        return f"{self.movie.title}; {self.auditorium}; start={self.start.hour}:{self.start.minute}; end={self.end.hour}:{self.end.minute}"
+        return f"{self.movie.title}; {self.auditorium}; start={self.start}:{self.start.minute}; end={self.end.hour}:{self.end.minute}"
     
     def is_available(self, datetime, seats_amount):
         """Checks that the showtime status is available. A showtime will be available if:
