@@ -1,12 +1,14 @@
 .movies-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px;
-    padding: 10px;
-    width: 50%;
-    background-color: white;
-    border-radius: 5px;
+    color:white;
+    font-size: 75px;
+}
+
+.movie-categories > .nav-item > .nav-link {
+    color: white !important;
+}
+
+.movie-categories > .nav-item > .active {
+    color: black !important;
 }
 
 .movies {

@@ -3,13 +3,35 @@
 
 {% block extrahead %}
 <link rel="stylesheet" href="{% static 'api/index.css' %}">
+<link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700|Cinzel:wght@700|Oswald:wght@700|Raleway:wght@700|Bebas+Neue&display=swap"
+    rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<div class="movies-header mx-auto">
-    <h1 class="text-center">Movies</h1>
+<h1 class="movies-header text-center my-4">NOW SHOWING</h1>
 
-</div>
+<ul class="movie-categories nav nav-tabs justify-content-center my-2 mx-5">
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">ALL</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">ACTION</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">COMEDY</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">DRAMA</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">SCI-FI</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">HORROR</a>
+    </li>
+</ul>
+
 <div class="movies d-flex justify-content-center flex-wrap">
     {% for movie in movies %}
     <div class="movie card" style="width: 18rem;">

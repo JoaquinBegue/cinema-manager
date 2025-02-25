@@ -19,6 +19,7 @@ MOVIE_TICKET_VALUE = 12
 # Create your models here.
 class Movie(m.Model):
     title = m.CharField(max_length=500)
+    synopsis = m.CharField(max_length=1000)
     poster = m.ImageField(default="default_poster.jpg" ,upload_to="images/posters/")
     genre = m.CharField(max_length=50, choices=MOVIE_GENRES)
     duration = m.IntegerField(verbose_name="duration in minutes")
