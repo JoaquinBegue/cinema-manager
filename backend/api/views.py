@@ -155,7 +155,6 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-
 # Rendered.
 
 class MovieListRendered(generics.ListAPIView):
@@ -166,31 +165,3 @@ class MovieListRendered(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         self.movies = self.get_queryset()
         return Response({'movies': self.movies}, template_name='api/movie_list.html')
-
-
-class MovieDetailsRendered(APIView):
-    """Returns data from the requested movie, such as movie info and the available showtimes."""
-
-    renderer_classes = [TemplateHTMLRenderer]
-
-    def get_movie(self, pk):
-        try:
-            return Movie.objects.get(pk=pk)
-        except Movie.DoesNotExist:
-            raise Http404
-    
-    def get_showtimes(self, movie):
-        showtimes = Showtime.objects.filter(movie=movie, status="available")
-        available_showtimes = [
-                showtime for showtime in showtimes
-                if showtime.is_available(timezone.now(), 0)
-        ]
-
-        return available_showtimes
-
-    def get(self, request, pk, format=None):
-        movie = self.get_movie(pk)
-        showtimes = Showtime.objects.filter(movie=movie, status="available")
-        movie_srl = MovieSerializer(movie)
-        showtimes_srl = ShowtimeSerializer(showtimes, many=True)
-        return Response({"movie": movie_srl.data, "showtimes": showtimes_srl.data}, template_name="api/movie_details.html")

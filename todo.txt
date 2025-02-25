@@ -1,0 +1,58 @@
+Operations:
+    - See all movies: DONE (MovieList view).
+
+    - See movie's showtimes: DONE (MovieDetails view).
+
+    - See showtime's seats: DONE (ShowtimeSeats view).
+
+    - Reserve seats: DONE (Reserve view).
+
+    - Automatically check for showtimes to expire or fill up. DONE
+        (Each time a showtime is requested, the view checks it status.
+
+    - Admin. Add, update and delete movies: DONE (Admin site).
+    - Admin. Add, update and delete showtimes: DONE (Admin site).
+        
+
+views:
+
+    - MovieList: list all movies.
+    - 
+
+todo:
+    - Remove SeatListCreate view.
+    - Remove ReservationListCreate view.
+    - Remove ShowtimeListCreate view.
+    - Restric access to Reserve view to authenticated users.
+    - Enable reservation listing
+
+Changelog
+
+12-02-25
+
+    Changes:
+
+    - Changed index view to list all movies through DRF's TemplateHTMLRenderer.
+    - Changed MovieDetails view to render the movie info into a html.
+
+    Todo: Display details of a movie showtime when is clicked. DONE
+
+
+
+20-02-25
+    
+    Changes:
+
+    - Added reservation system to movie details page.
+
+    Todo:
+    
+    - Add VIDEO_ID field to movie model, to display the movie's trailer with the youtube player api.
+    
+
+
+21-02-25
+
+    Changes:
+    - Added navbar and styling to index page.
+

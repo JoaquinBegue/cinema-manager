@@ -1,13 +1,35 @@
 {% extends "api/layout.html" %}
 {% load static %}
 
-{% block body %}
-    <h1>Movies</h1>
-    <ul>
-        {% for movie in movies %}
-            <a href="{% url 'movie-details' pk=movie.id %}">
-              <li>{{ movie.title }}</li>
-            </a>
-        {% endfor %}
-    </ul>
+{% block extrahead %}
+<link rel="stylesheet" href="{% static 'api/index.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="movies-header mx-auto">
+    <h1 class="text-center">Movies</h1>
+
+</div>
+<div class="movies d-flex justify-content-center flex-wrap">
+    {% for movie in movies %}
+    <div class="movie card" style="width: 18rem;">
+        <a href="{% url 'movie-details' pk=movie.id %}">
+            <img src="{{ MEDIA_URL }}\media\images\posters\default_poster.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h3 class="card-text text-truncate">{{ movie.title }}</h3>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+    {% for movie in movies %}
+    <div class="movie card" style="width: 18rem;">
+        <a href="{% url 'movie-details' pk=movie.id %}">
+            <img src="{{ MEDIA_URL }}\media\images\posters\default_poster.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h3 class="card-text text-truncate">{{ movie.title }}</h3>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}
