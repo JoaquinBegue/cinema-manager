@@ -1,0 +1,58 @@
+{% extends "api/layout.html" %}
+{% load static %}
+
+{% block title %}{{ showtime.movie.title }} - {% endblock %}
+
+
+{% block extrahead %}
+<link rel="stylesheet" href="{% static 'api/seat_selection.css' %}">
+<script src="{% static 'api/seat_selection.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="seat-selection">
+  
+  <div class="container">
+    <h1 class="movie-title text-center">{{ showtime.movie.title }}</h1>
+    <div class="screen"></div>
+
+    {% for row, seats in seats_by_row.items %}
+    <div class="row">
+      {% for seat in seats %}
+      <div class="seat{% if seat.available is not True %} occupied{% endif %}">
+        {{ seat.row }}{{ seat.column }}
+      <input type="hidden" id="seat-id" value="{{ seat.id }}">
+      </div>  
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <ul class="showcase">
+      <li>
+        <div class="seat"></div>
+        <small>Available</small>
+      </li>
+      <li>
+        <div class="seat selected"></div>
+        <small>Selected</small>
+      </li>
+      <li>
+        <div class="seat occupied"></div>
+        <small>Occupied</small>
+      </li>
+    </ul>
+  </div>
+
+  <p class="text">
+    You have selected <span id="count">0</span> seats for a price of $<span id="total">0</span>
+  </p>
+
+  <input type="hidden" id="showtime-id" value="{{ showtime.id }}">
+  <button type="button" class="btn btn-light" onclick="reserveSeats()">Reserve</button>
+
+  <div class="serialized-seats">
+    
+  </div>
+</div>
+
+{% endblock %}

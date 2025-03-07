@@ -1,8 +1,16 @@
 var reservedSeats = [];
 var showtimeId = 0;
 
+const today = new Date().toISOString().slice(0, 10);
+
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("hi");
+  console.log("DOM loaded");
+  const selectElement = document.querySelector('.showtime-day-select');
+  selectElement.addEventListener('change', (event) => {
+    const date = event.target.value;
+    displayShowtimes(date);
+  });
+  setTodayShowtimes();
 } );
 
 function showtimeSelected(showtime) {
@@ -78,6 +86,35 @@ function reserveSeats() {
       window.location.reload();
     } else {
       alert("Failed to reserve seats!");
+    }
+  });
+}
+
+function displayShowtimes(date) {
+  // Get all showtime bodies.
+  let showtimeBodies = document.querySelectorAll(".showtimes-body");
+  // Hide all showtime bodies.
+  showtimeBodies.forEach(body => {
+    body.style.display = "none";
+  });
+  // Show the showtimes for the selected date.
+  if (date === "today") {
+    date = today
+  }
+  document.getElementById(`showtimes-${date}`).style.display = "block";
+}
+
+function setTodayShowtimes() {    
+  // Get all showtime days.
+  let showtimeDays = document.querySelectorAll(".showtime-day");
+  // Iterate through the elements.
+  showtimeDays.forEach(element => {
+    // If the element's date is today's date.
+    if (element.value === today) {
+      // Hide the element and display the showtimes.
+      element.style.display = "none";
+      displayShowtimes(element.value);
+      return;
     }
   });
 }

@@ -8,7 +8,7 @@ urlpatterns = [
     # Generics.
     path("movies/", views.MovieList.as_view(), name="movie-list"),
     path("seats/", views.SeatListCreate.as_view(), name="seat-list-create"),
-    #path("reservations/", views.ReservationListCreate.as_view(), name="reservation-list-create"),
+    path("reservations/", views.ReservationListCreate.as_view(), name="reservation-list-create"),
     path("showtimes/", views.ShowtimeListCreate.as_view(), name="showtime-list-create"),
 
     # Custom.

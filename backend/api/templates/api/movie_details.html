@@ -1,51 +1,59 @@
 {% extends "api/layout.html" %}
 {% load static %}
 
+{% block title %}{{ movie.title }} - {% endblock %}
+
+
 {% block extrahead %}
 <link rel="stylesheet" href="{% static 'api/movie_details.css' %}">
 <script src="{% static 'api/movie_details.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-<h1 class="movie-title text-center">{{ movie.title }}</h1>
+<div class="movie-details mx-auto">
+  <h1 class="movie-title text-center">{{ movie.title }}</h1>
 
-<div class="poster-info mx-auto">
+  <div class="poster-info">
     <img class="poster" src="{{ MEDIA_URL }}\media\images\posters\default_poster.jpg" class="card-img-top" alt="...">
-    <div class="info">
-        <p class="info-text">Director: {{ movie.director }}</p>
-        <p class="info-text">Cast: {{ movie.cast }}</p>
-        <p class="info-text">Genre: {{ movie.genre }}</p>
-        <p class="info-text">Duration: {{ movie.duration }} minutes</p>
+    <div class="info mx-4">
+      <p class="info-text"><strong>Director:</strong> {{ movie.director }}</p>
+      <p class="info-text"><strong>Cast:</strong> {{ movie.cast }}</p>
+      <p class="info-text"><strong>Genre:</strong> {{ movie.genre }}</p>
+      <p class="info-text"><strong>Duration:</strong> {{ movie.duration }} minutes</p>
     </div>
-    <p class="synopsis">{{ movie.synopsis }}</p>
-</div>
+    <div>
+      <h2>Synopsis</h2>
+      <p class="synopsis">{{ movie.synopsis }}</p>
+    </div>
+  </div>
 
-<div class="movie-trailer">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/vKQi3bBA1y8?si=en5HjrU9zfIBrATi"
+  <div class="trailer-showtimes">
+    <div class="movie-trailer">
+      <iframe width="650" height="365" src="https://www.youtube.com/embed/vKQi3bBA1y8?si=en5HjrU9zfIBrATi"
         title="YouTube video player" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <div class="showtimes">
+      <div class="showtimes-header">
+        <h3>Available showtimes:</h3>
+        <select class="showtime-day-select form-select form-select-lg mb-3" aria-label="Large select example">
+          <option selected value="today">Today</option>
+          {% for date, showtimes in showtimes_per_day.items %}
+            <option class="showtime-day" value="{{date|date:'Y-m-d'}}">{{date|date:'l, d-m-y'}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% for date, showtimes in showtimes_per_day.items %}
+      <div class="showtimes-body list-group" id="showtimes-{{date|date:'Y-m-d'}}">
+        {% for showtime in showtimes %}
+        <a href="{% url 'showtime-seats' pk=showtime.id %}" class="showtime list-group-item list-group-item-action"
+          id="showtime-{{showtime.start|date:'Y-m-d-H-i'}}">{{showtime.start|date:'H:i'}}</a>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
-
-<h3>Available showtimes:</h3>
-<form>
-    {% for showtime in showtimes %}
-    <input type="radio" name="showtime" value="{{ showtime.id }}" id="showtime_{{ showtime.id }}" required
-        onclick="showtimeSelected(this)">
-    {{ showtime.start }}
-    </input>
-    <br>
-    {% endfor %}
-</form>
-
-<div id="showtime-seats">
-    <h3>Showtime seats:</h3>
-    <table id="seats">
-        <tr id="row_A">
-            <td id="seat_A1">A1</td>
-        </tr>
-    </table>
-</div>
-
-<button type="button" onclick="reserveSeats()">Reserve</button>
 {% endblock %}

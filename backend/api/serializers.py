@@ -35,6 +35,7 @@ class ShowtimeSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     url = serializers.CharField(source="get_absolute_url", read_only=True)
+    reservations = serializers.PrimaryKeyRelatedField(many=True, queryset=Reservation.objects.all())
 
     class Meta:
         model = User

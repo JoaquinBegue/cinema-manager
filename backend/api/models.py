@@ -52,7 +52,7 @@ class Seat(m.Model):
 class Reservation(m.Model):
     user = m.ForeignKey(User, related_name="reservations", on_delete=m.CASCADE)
     showtime = m.ForeignKey("Showtime", related_name="reservations", on_delete=m.CASCADE)
-    seat = m.ForeignKey(Seat, related_name="reservations", on_delete=m.CASCADE, null=True)
+    seats = m.ManyToManyField(Seat, related_name="reservations", blank=True)
 
     def __str__(self) -> str:
         return f"User: {self.user}; Showtime: {self.showtime.start}; Seat: {self.seat}"

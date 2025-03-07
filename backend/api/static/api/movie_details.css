@@ -1,3 +1,11 @@
+.movie-details {
+    max-width: 75%;
+    margin-bottom: 50px;
+}
+
+
+/** MOVIE INFO **/
+
 .movie-title {
     color:white !important;
     font-size: 50px;
@@ -10,32 +18,60 @@
     justify-content: space-between;
     padding: 20px;
     border-radius: 10px;
-    min-width: 75%;
+    width: 100%;
     height: fit-content;
 
     background-color: white;
 }
 
 .poster {
-    width: 300px;
-    height: auto;
+    height: 400px;
+    width: auto;
 }
 
 .synopsis {
     width: 400px;
-    height: 250px;
+    height: 370px;
     overflow-y: scroll;
     color: black;
     background-color: white;
+}
+
+
+/** TRAILER AND SHOWTIMES **/
+
+.trailer-showtimes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 .movie-trailer {
     display: flex;
     justify-content: center;
     align-items: center;
-
-    margin-top: 50px;
+    margin-right: 20px;
 }
+
+
+/** SHOWTIMES **/
+
+.showtimes {
+    width: 550px;
+}
+
+.showtimes-header > h3 {
+    color: white !important;
+}
+
+.showtimes-body {
+    display: none;
+    width: 100%;
+    background-color: white;
+}
+
+
+/** SEATS **/
 
 #showtime-seats {
     display: none;

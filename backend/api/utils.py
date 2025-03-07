@@ -56,20 +56,25 @@ def create_movies():
     return movies
 
 # SHOWTIMES
-def create_showtimes(n, movie):
+def create_showtimes(movie):
+    """Create 15 showtimes for the provided movie. 3 showtimes per day for 5 days."""
     showtimes = []
-    start = timezone.make_aware(datetime(2025, 2, 20, 12)) 
-    for showtime in range(n):
-        end = start + timedelta(minutes=movie.duration) + timedelta(minutes=15)
-        s = Showtime.objects.create(
-            movie=movie,
-            auditorium=1,
-            start=start,
-            end=end,
-            status="available"
-        )
-        showtimes.append(s)
-        start += timedelta(minutes=movie.duration) + timedelta(minutes=15)
+    start = timezone.make_aware(datetime.now())
+    for day in range(5):
+        movie_start = start
+        for showtime in range(3):
+            movie_duration = timedelta(minutes=movie.duration) + timedelta(minutes=15)
+            end = movie_start + movie_duration
+            s = Showtime.objects.create(
+                movie=movie,
+                auditorium=1,
+                start=movie_start,
+                end=end,
+                status="available"
+            )
+            showtimes.append(s)
+            movie_start += movie_duration
+        start += timedelta(days=1)
 
     return showtimes
 
@@ -77,8 +82,8 @@ def create_showtimes(n, movie):
 def create_seats():
     # Create 20 seats in 5 auditoriums. 5 seats in 4 rows.
     seats = []
-    for row in ["A", "B", "C", "D"]:
-        for column in range(5):
+    for row in ["A", "B", "C", "D", "E", "F"]:
+        for column in range(8):
             s = Seat.objects.create(
                 auditorium=1,
                 row=row,
@@ -126,4 +131,72 @@ def test():
 from api.models import Movie 
 from api.utils import create_showtimes
 m = Movie.objects.get(title="The Matrix")
-create_showtimes(4, m)
+create_showtimes(m)
+
+from api.models import Seat 
+from api.utils import create_seats
+Seat.objects.all().delete()
+create_seats()
+
+seats_by_row = {
+    'A': [
+        {'id': 449, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 1},
+        {'id': 450, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 2},
+        {'id': 451, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 3},
+        {'id': 452, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 4},
+        {'id': 453, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 5},
+        {'id': 454, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 6},
+        {'id': 455, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 7},
+        {'id': 456, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 8}
+    ],
+    'B': [
+        {'id': 457, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 1},
+        {'id': 458, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 2},
+        {'id': 459, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 3},
+        {'id': 460, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 4},
+        {'id': 461, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 5},
+        {'id': 462, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 6},
+        {'id': 463, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 7},
+        {'id': 464, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 8}
+    ],
+    'C': [
+        {'id': 465, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 1},
+        {'id': 466, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 2},
+        {'id': 467, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 3},
+        {'id': 468, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 4},
+        {'id': 469, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 5},
+        {'id': 470, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 6},
+        {'id': 471, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 7},
+        {'id': 472, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 8}
+    ],
+    'D': [
+        {'id': 473, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 1},
+        {'id': 474, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 2},
+        {'id': 475, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 3},
+        {'id': 476, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 4},
+        {'id': 477, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 5},
+        {'id': 478, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 6},
+        {'id': 479, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 7},
+        {'id': 480, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 8}
+    ],
+    'E': [
+        {'id': 481, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 1},
+        {'id': 482, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 2},
+        {'id': 483, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 3},
+        {'id': 484, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 4},
+        {'id': 485, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 5},
+        {'id': 486, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 6},
+        {'id': 487, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 7},
+        {'id': 488, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 8}
+    ],
+    'F': [
+        {'id': 489, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 1},
+        {'id': 490, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 2},
+        {'id': 491, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 3},
+        {'id': 492, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 4},
+        {'id': 493, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 5},
+        {'id': 494, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 6},
+        {'id': 495, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 7},
+        {'id': 496, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 8}
+    ]
+}

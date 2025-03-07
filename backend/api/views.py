@@ -19,38 +19,16 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from .models import Movie, Seat, Reservation, Showtime, User
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
 
+# Index. List all movies.
 class Index(generics.ListAPIView):
-    queryset = Movie.objects.all()
     renderer_classes = [TemplateHTMLRenderer]
+    
+    queryset = Movie.objects.all()
 
     def get(self, request, *args, **kwargs):
         return Response({"movies": self.get_queryset()}, template_name='api/index.html')
 
-
-# Generics.
-
-class MovieList(generics.ListAPIView):
-    queryset = Movie.objects.all()
-    serializer_class = MovieSerializer
-
-
-class SeatListCreate(generics.ListAPIView):
-    queryset = Seat.objects.all()
-    serializer_class = SeatSerializer
-
-
-class ReservationListCreate(generics.ListAPIView):
-    queryset = Reservation.objects.all()
-    serializer_class = ReservationSerializer
-
-
-class ShowtimeListCreate(generics.ListAPIView):
-    queryset = Showtime.objects.all()
-    serializer_class = ShowtimeSerializer
-
-
-# Custom.
-
+# Movie page. Get movie info and list all showtimes.
 class MovieDetails(APIView):
     """Returns data from the requested movie, such as movie info and the available showtimes."""
     renderer_classes = [TemplateHTMLRenderer]
@@ -62,26 +40,38 @@ class MovieDetails(APIView):
             raise Http404
     
     def get_showtimes(self, movie):
-        showtimes = Showtime.objects.filter(movie=movie, status="available")
+        showtimes = Showtime.objects.filter(movie=movie, status="available").order_by("start")
         available_showtimes = [
                 showtime for showtime in showtimes
                 if showtime.is_available(timezone.now(), 0)
         ]
 
-        return available_showtimes
+        showtimes_per_day = {}
+        for showtime in available_showtimes:
+            day = showtime.start.date()
+            weekday = day.strftime("%A")
+            if day in showtimes_per_day:
+                showtimes_per_day[day].append(showtime)
+            else:
+                showtimes_per_day[day] = [showtime]
+
+        return available_showtimes, showtimes_per_day
 
     def get(self, request, pk, format=None):
         movie = self.get_movie(pk)
         # TODO: Get showtimes through the get_showtimes method.
         #showtimes = Showtime.objects.filter(movie=movie, status="available")
-        showtimes = self.get_showtimes(movie)
+        showtimes, showtimes_per_day = self.get_showtimes(movie)
         #movie_srl = MovieSerializer(movie)
         #showtimes_srl = ShowtimeSerializer(showtimes, many=True)
-        return Response({"movie": movie, "showtimes":showtimes}, template_name='api/movie_details.html')
-    
+        return Response({"movie": movie, "showtimes":showtimes, "showtimes_per_day":showtimes_per_day}, template_name='api/movie_details.html')
 
+# Seat reservation page. List all showtime's seats.
 class ShowtimeSeats(APIView):
     """Returns all the seats for a requested showtime."""
+    renderer_classes = [TemplateHTMLRenderer]
+
+
     def get_showtime(self, pk):
         try:
             return Showtime.objects.get(pk=pk, status="available")
@@ -90,14 +80,20 @@ class ShowtimeSeats(APIView):
     
     def get(self, request, pk, format=None):
         showtime = self.get_showtime(pk)
-        showtime_srl = ShowtimeSerializer(showtime)
+        #showtime_srl = ShowtimeSerializer(showtime)
         
         seats = Seat.objects.filter(auditorium=showtime.auditorium)
-
         seats_srl = SeatSerializer(seats, many=True, context={"showtime": showtime})
-        return Response(data=(showtime_srl.data, seats_srl.data))
-    
+        seats_by_row = {}
+        for seat in seats_srl.data:
+            if seat["row"] in seats_by_row:
+                seats_by_row[seat["row"]].append(seat)
+            else:
+                seats_by_row[seat["row"]] = [seat]
 
+        return Response({"showtime": showtime, "seats": seats, "seats_by_row": seats_by_row}, template_name='api/seat_selection.html')
+
+# Reservation endpoint.
 class Reserve(APIView):
     #permission_classes = [IsAuthenticated]
 
@@ -131,20 +127,43 @@ class Reserve(APIView):
         # Get the showtime.
         showtime = self.get_showtime(showtime, len(seats))
 
-        # Create the reservations.
-        reservations = []
-        ### TEMPORAL: Get a dummy user.
-        user = choice(User.objects.all())
+        # Retrieve all seats.
+        validated_seats = []
         for seat in seats:
             s = self.get_seat(seat, showtime)
-            r = Reservation(user=user, seat=s, showtime=showtime)
-            reservations.append(r)
+            validated_seats.append(s)
 
-        # Once all reservations are successfully created, save them.
-        for r in reservations: r.save()
+        ### TEMPORAL: Get a dummy user.
+        user = choice(User.objects.all())
+
+        # Once all seats are successfully retrieved, create the reservation.
+        r = Reservation.objects.create(user=user, showtime=showtime)
+        r.seats.set(validated_seats)
+        r.save()
 
         return Response(status=status.HTTP_201_CREATED)
-    
+
+# Generics.
+
+class MovieList(generics.ListAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+
+
+class SeatListCreate(generics.ListAPIView):
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
+
+
+class ReservationListCreate(generics.ListAPIView):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
+
+
+class ShowtimeListCreate(generics.ListAPIView):
+    queryset = Showtime.objects.all()
+    serializer_class = ShowtimeSerializer
+
 
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
@@ -154,14 +173,3 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
-# Rendered.
-
-class MovieListRendered(generics.ListAPIView):
-    queryset = Movie.objects.all()
-    serializer_class = MovieSerializer
-    renderer_classes = [TemplateHTMLRenderer]
-
-    def get(self, request, *args, **kwargs):
-        self.movies = self.get_queryset()
-        return Response({'movies': self.movies}, template_name='api/movie_list.html')
