@@ -8,6 +8,18 @@
     rel="stylesheet">
 {% endblock %}
 
+{% block extra_navbar %}
+<form role="search">
+    <input class="search-bar form-control mx-5" list="datalistOptions" type="search" placeholder="Search"
+        aria-label="Search">
+    <datalist id="datalistOptions">
+        {% for movie in movies %}
+        <option value="{{ movie.title }}">
+        {% endfor %}
+    </datalist>
+</form>
+{% endblock %}
+
 {% block content %}
 <h1 class="movies-header text-center my-4">NOW SHOWING</h1>
 
