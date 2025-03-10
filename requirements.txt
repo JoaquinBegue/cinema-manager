@@ -2,3 +2,4 @@ django
 djangorestframework
 pillow
 django-jazzmin
+django-debug-toolbar

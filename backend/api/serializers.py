@@ -34,9 +34,10 @@ class ShowtimeSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    url = serializers.CharField(source="get_absolute_url", read_only=True)
-    reservations = serializers.PrimaryKeyRelatedField(many=True, queryset=Reservation.objects.all())
+    #url = serializers.CharField(source="get_absolute_url", read_only=True)
+    #reservations = serializers.PrimaryKeyRelatedField(many=True, queryset=Reservation.objects.all())
 
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ["id", "username", "password", "email"]
+        extra_kwargs = {"password": {"write_only": True, "required": True}}

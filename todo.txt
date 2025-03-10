@@ -56,3 +56,17 @@ Changelog
     Changes:
     - Added navbar and styling to index page.
 
+25-02-25
+
+    Changes:
+    - Added styling to movie details page.
+
+6-03-25
+
+    Changes:
+    - Added showtime selector and seat selection page.
+
+    TODO:
+    - Fix the DB seat quantity to match the frontend one.
+    - Fetch each displayed seat with the data sent from backend.
+    - Manage the seat selection through the seats id instead of seat number.

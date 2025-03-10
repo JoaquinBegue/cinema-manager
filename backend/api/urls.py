@@ -15,4 +15,9 @@ urlpatterns = [
     path("movie/<int:pk>/", views.MovieDetails.as_view(), name="movie-details"),
     path("showtime/<int:pk>/", views.ShowtimeSeats.as_view(), name="showtime-seats"),
     path("reserve/", views.Reserve.as_view(), name="reserve"),
+
+    # Auth.
+    path("register/", views.register),
+    path("login/", views.login),
+    path("test_token/", views.test_token),
 ]
