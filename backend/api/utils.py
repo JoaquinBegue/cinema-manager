@@ -18,14 +18,15 @@ from rest_framework.test import APIRequestFactory
 
 ### GENERATOR FUNCTIONS
 
+
 # Create movies
 
 MOVIES = (
-    {"id": 1, "title": "The Matrix", "genre": "Science Fiction", "duration": 136, "director": "Lana Wachowski, Lilly Wachowski", "cast": "Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss, Hugo Weaving, Joe Pantoliano" },
-    {"id": 2, "title": "Inception", "genre": "Action", "duration": 148,  "director": "Christopher Nolan", "cast": "Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page, Tom Hardy, Ken Watanabe" },
-    {"id": 3, "title": "The Shawshank Redemption", "genre": "Drama", "duration": 142,  "director": "Frank Darabont", "cast": "Tim Robbins, Morgan Freeman, Bob Gunton, William Sadler, Clancy Brown" },
-    {"id": 4, "title": "The Godfather", "genre": "Crime", "duration": 175,  "director": "Francis Ford Coppola", "cast": "Marlon Brando, Al Pacino, James Caan, Richard S. Castellano, Robert Duvall" },
-    {"id": 5, "title": "Pulp Fiction", "genre": "Crime", "duration": 154,  "director": "Quentin Tarantino", "cast": "John Travolta, Uma Thurman, Samuel L. Jackson, Bruce Willis, Ving Rhames" }
+    {"id": 1, "title": "The Matrix", "genre": "Science Fiction", "duration": 136, "director": "Lana Wachowski, Lilly Wachowski", "cast": "Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss, Hugo Weaving, Joe Pantoliano", "trailer_url": "https://www.youtube.com/embed/vKQi3bBA1y8?si=en5HjrU9zfIBrATi" },
+    {"id": 2, "title": "Inception", "genre": "Action", "duration": 148,  "director": "Christopher Nolan", "cast": "Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page, Tom Hardy, Ken Watanabe", "trailer_url": "https://www.youtube.com/embed/YoHD9XEInc0?si=951iu6mkmv7W71kp" },
+    {"id": 3, "title": "The Shawshank Redemption", "genre": "Drama", "duration": 142,  "director": "Frank Darabont", "cast": "Tim Robbins, Morgan Freeman, Bob Gunton, William Sadler, Clancy Brown", "trailer_url": "https://www.youtube.com/embed/PLl99DlL6b4?si=yK98lhMvqmZNzgzY" },
+    {"id": 4, "title": "The Godfather", "genre": "Crime", "duration": 175,  "director": "Francis Ford Coppola", "cast": "Marlon Brando, Al Pacino, James Caan, Richard S. Castellano, Robert Duvall", "trailer_url": "https://www.youtube.com/embed/UaVTIH8mujA?si=yYBMFbdYY4mLhdqS" },
+    {"id": 5, "title": "Pulp Fiction", "genre": "Crime", "duration": 154,  "director": "Quentin Tarantino", "cast": "John Travolta, Uma Thurman, Samuel L. Jackson, Bruce Willis, Ving Rhames", "trailer_url": "https://www.youtube.com/embed/s7EdQ4FqbhY?si=FgpJtoYl2DG7WrOT" }
 )
 
 SHOWTIME = (
@@ -50,6 +51,7 @@ def create_movies():
             duration=movie["duration"],
             director=movie["director"],
             cast=movie["cast"],
+            trailer_url=movie["trailer_url"]
         )
         movies.append(m)
 
@@ -127,76 +129,9 @@ def test():
     for p in permissions.all():
         print(p)
 
+def init_db():
+    m = create_movies()
 
-from api.models import Movie 
-from api.utils import create_showtimes
-m = Movie.objects.get(title="The Matrix")
-create_showtimes(m)
+    create_showtimes(m[0])
 
-from api.models import Seat 
-from api.utils import create_seats
-Seat.objects.all().delete()
-create_seats()
-
-seats_by_row = {
-    'A': [
-        {'id': 449, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 1},
-        {'id': 450, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 2},
-        {'id': 451, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 3},
-        {'id': 452, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 4},
-        {'id': 453, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 5},
-        {'id': 454, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 6},
-        {'id': 455, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 7},
-        {'id': 456, 'available': True, 'auditorium': 1, 'row': 'A', 'column': 8}
-    ],
-    'B': [
-        {'id': 457, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 1},
-        {'id': 458, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 2},
-        {'id': 459, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 3},
-        {'id': 460, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 4},
-        {'id': 461, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 5},
-        {'id': 462, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 6},
-        {'id': 463, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 7},
-        {'id': 464, 'available': True, 'auditorium': 1, 'row': 'B', 'column': 8}
-    ],
-    'C': [
-        {'id': 465, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 1},
-        {'id': 466, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 2},
-        {'id': 467, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 3},
-        {'id': 468, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 4},
-        {'id': 469, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 5},
-        {'id': 470, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 6},
-        {'id': 471, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 7},
-        {'id': 472, 'available': True, 'auditorium': 1, 'row': 'C', 'column': 8}
-    ],
-    'D': [
-        {'id': 473, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 1},
-        {'id': 474, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 2},
-        {'id': 475, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 3},
-        {'id': 476, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 4},
-        {'id': 477, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 5},
-        {'id': 478, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 6},
-        {'id': 479, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 7},
-        {'id': 480, 'available': True, 'auditorium': 1, 'row': 'D', 'column': 8}
-    ],
-    'E': [
-        {'id': 481, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 1},
-        {'id': 482, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 2},
-        {'id': 483, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 3},
-        {'id': 484, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 4},
-        {'id': 485, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 5},
-        {'id': 486, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 6},
-        {'id': 487, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 7},
-        {'id': 488, 'available': True, 'auditorium': 1, 'row': 'E', 'column': 8}
-    ],
-    'F': [
-        {'id': 489, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 1},
-        {'id': 490, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 2},
-        {'id': 491, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 3},
-        {'id': 492, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 4},
-        {'id': 493, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 5},
-        {'id': 494, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 6},
-        {'id': 495, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 7},
-        {'id': 496, 'available': True, 'auditorium': 1, 'row': 'F', 'column': 8}
-    ]
-}
+    create_seats()

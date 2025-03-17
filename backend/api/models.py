@@ -20,11 +20,12 @@ MOVIE_TICKET_VALUE = 12
 class Movie(m.Model):
     title = m.CharField(max_length=500)
     synopsis = m.CharField(max_length=1000)
-    poster = m.ImageField(default="default_poster.jpg" ,upload_to="images/posters/")
+    poster = m.ImageField(default="default_poster.jpg", upload_to="images/posters/")
     genre = m.CharField(max_length=50, choices=MOVIE_GENRES)
     duration = m.IntegerField(verbose_name="duration in minutes")
     director = m.CharField(max_length=255)
     cast = m.CharField(max_length=2500)
+    trailer_url = m.CharField(max_length=1000)
 
     def __str__(self) -> str:
         return f"ID: {self.id}; Title: {self.title}."
@@ -55,7 +56,7 @@ class Reservation(m.Model):
     seats = m.ManyToManyField(Seat, related_name="reservations", blank=True)
 
     def __str__(self) -> str:
-        return f"User: {self.user}; Showtime: {self.showtime.start}; Seat: {self.seat}"
+        return f"User: {self.user}; Showtime: {self.showtime.start}; Seats: {self.seats.all()}"
 
 
 class Showtime(m.Model):

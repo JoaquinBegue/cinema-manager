@@ -8,21 +8,22 @@ from django.http import Http404
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+
 # DRF stuff
 from rest_framework import generics, status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.renderers import TemplateHTMLRenderer
 
 # API stuff
-from .models import Movie, Seat, Reservation, Showtime, User
+from .models import Movie, Seat, Reservation, Showtime
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
 
 # Index. List all movies.
 class Index(generics.ListAPIView):
     renderer_classes = [TemplateHTMLRenderer]
+    permission_classes = [AllowAny]
     
     queryset = Movie.objects.all()
 
@@ -33,6 +34,8 @@ class Index(generics.ListAPIView):
 class MovieDetails(APIView):
     """Returns data from the requested movie, such as movie info and the available showtimes."""
     renderer_classes = [TemplateHTMLRenderer]
+    permission_classes = [IsAuthenticated]
+
 
     def get_movie(self, pk):
         try:
@@ -71,6 +74,7 @@ class MovieDetails(APIView):
 class ShowtimeSeats(APIView):
     """Returns all the seats for a requested showtime."""
     renderer_classes = [TemplateHTMLRenderer]
+    permission_classes = [IsAuthenticated]
 
 
     def get_showtime(self, pk):
@@ -150,7 +154,6 @@ class Register(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
-    
 
 # Generics.
 
