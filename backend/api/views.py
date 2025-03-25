@@ -13,22 +13,38 @@ from django.contrib.auth.models import User
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.renderers import TemplateHTMLRenderer
 
 # API stuff
 from .models import Movie, Seat, Reservation, Showtime, MOVIE_GENRES
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
 
-# Index. List all movies.
-class Index(generics.ListAPIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    permission_classes = [AllowAny]
-    
-    queryset = Movie.objects.all()
+    # AUTHENTICATION.
 
-    def get(self, request, *args, **kwargs):
-        return Response({"movies": self.get_queryset()}, template_name='api/index.html')
+# Register.
+class Register(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+
+    # USER REQUEST FLOW.
+
+# Index. List all movies.
+class MovieList(generics.ListAPIView):
+    serializer_class = MovieSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Movie.objects.all()
+        category = self.request.query_params.get("category")
+        print(MOVIE_GENRES.values())
+        if category is not None:
+            if category not in MOVIE_GENRES.values():
+                raise Http404
+            queryset = queryset.filter(genre=category)
+        return queryset
 
 # Movie page. Get movie info and list all showtimes.
 class MovieDetails(APIView):
@@ -65,13 +81,10 @@ class MovieDetails(APIView):
         movie_srl = MovieSerializer(movie)
         return Response({"movie": movie_srl.data, "showtimes": self.get_showtimes(movie)})
 
-
 # Seat reservation page. List all showtime's seats.
 class ShowtimeSeats(APIView):
     """Returns all the seats for a requested showtime."""
-    renderer_classes = [TemplateHTMLRenderer]
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [AllowAny]
 
     def get_showtime(self, pk):
         try:
@@ -81,7 +94,7 @@ class ShowtimeSeats(APIView):
     
     def get(self, request, pk, format=None):
         showtime = self.get_showtime(pk)
-        #showtime_srl = ShowtimeSerializer(showtime)
+        showtime_srl = ShowtimeSerializer(showtime)
         
         seats = Seat.objects.filter(auditorium=showtime.auditorium)
         seats_srl = SeatSerializer(seats, many=True, context={"showtime": showtime})
@@ -92,7 +105,7 @@ class ShowtimeSeats(APIView):
             else:
                 seats_by_row[seat["row"]] = [seat]
 
-        return Response({"showtime": showtime, "seats": seats, "seats_by_row": seats_by_row}, template_name='api/seat_selection.html')
+        return Response({"showtime": showtime_srl.data, "seats": seats_by_row})
 
 # Reservation endpoint.
 class Reserve(APIView):
@@ -144,29 +157,28 @@ class Reserve(APIView):
 
         return Response(status=status.HTTP_201_CREATED)
 
-# Register
-class Register(generics.CreateAPIView):
+
+    # ADMIN
+
+# Movie creation.
+class MovieCreate(generics.CreateAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    permission_classes = [IsAuthenticated]
+
+# User list.
+class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
 
-# Generics.
+    # GENERICS.
 
-class MovieList(generics.ListAPIView):
+class MovieListCreate(generics.ListCreateAPIView):
+    queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        queryset = Movie.objects.all()
-        category = self.request.query_params.get("category")
-        print(MOVIE_GENRES.values())
-        if category is not None:
-            if category not in MOVIE_GENRES.values():
-                raise Http404
-            queryset = queryset.filter(genre=category)
-        return queryset
-
+    permission_classes = [IsAuthenticated]
 
 class SeatListCreate(generics.ListAPIView):
     queryset = Seat.objects.all()

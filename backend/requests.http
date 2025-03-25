@@ -14,7 +14,7 @@ content-type: application/json
     "username": "user1@example.com", "password": "12345"
 }
 
-### Get Token
+### Refresh Token
 POST http://localhost:8000/api/auth/token/refresh/
 content-type: application/json
 
@@ -22,5 +22,21 @@ content-type: application/json
     "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0MjY3OTc1NCwiaWF0IjoxNzQyNTkzMzU0LCJqdGkiOiIzYzRkYTNhNzJlNzU0MDA2OTMxZWE3NzBlMTM4NDFkMCIsInVzZXJfaWQiOjN9.RRAKuCvDOAH6slJCljfp32YjBCPhj9eOfwfqIlktXe8"
 }
 
+### 1. Index, get movies:
+GET http://localhost:8000/api/movies/
 
+### 2. Movie details page:
+GET http://localhost:8000/api/movie/1/
 
+### 3. Showtime selected, get showtime seats:
+GET http://localhost:8000/api/showtime/30/
+
+### 4. Seats selected, perform reservation:
+POST http://localhost:8000/api/reserve/
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyOTMxNDc1LCJpYXQiOjE3NDI5MzExNzUsImp0aSI6IjM3OWViNWM2NjM4MzRmNjRhN2NhZTc0ZmNmMDNmODQyIiwidXNlcl9pZCI6M30.QHb6IT_oA7Uvircdpoy2SjRA_PU5WrV3t84fPFPpgN4
+
+{
+    "showtime": 30,
+    "seats": [1, 2, 3]
+}
