@@ -70,3 +70,8 @@ Changelog
     - Fix the DB seat quantity to match the frontend one.
     - Fetch each displayed seat with the data sent from backend.
     - Manage the seat selection through the seats id instead of seat number.
+
+21-03-25
+
+    Changes:
+    - Adapted some views to migrate frontend to react.

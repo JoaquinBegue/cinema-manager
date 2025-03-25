@@ -17,7 +17,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.renderers import TemplateHTMLRenderer
 
 # API stuff
-from .models import Movie, Seat, Reservation, Showtime
+from .models import Movie, Seat, Reservation, Showtime, MOVIE_GENRES
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
 
 # Index. List all movies.
@@ -33,8 +33,7 @@ class Index(generics.ListAPIView):
 # Movie page. Get movie info and list all showtimes.
 class MovieDetails(APIView):
     """Returns data from the requested movie, such as movie info and the available showtimes."""
-    renderer_classes = [TemplateHTMLRenderer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
     def get_movie(self, pk):
@@ -52,23 +51,20 @@ class MovieDetails(APIView):
 
         showtimes_per_day = {}
         for showtime in available_showtimes:
-            day = showtime.start.date()
-            weekday = day.strftime("%A")
-            if day in showtimes_per_day:
-                showtimes_per_day[day].append(showtime)
-            else:
-                showtimes_per_day[day] = [showtime]
+            day = showtime.start.date().strftime("%Y-%m-%d-%A")
 
-        return available_showtimes, showtimes_per_day
+            if day in showtimes_per_day:
+                showtimes_per_day[day].append(ShowtimeSerializer(showtime).data)
+            else:
+                showtimes_per_day[day] = [ShowtimeSerializer(showtime).data]
+
+        return showtimes_per_day
 
     def get(self, request, pk, format=None):
         movie = self.get_movie(pk)
-        # TODO: Get showtimes through the get_showtimes method.
-        #showtimes = Showtime.objects.filter(movie=movie, status="available")
-        showtimes, showtimes_per_day = self.get_showtimes(movie)
-        #movie_srl = MovieSerializer(movie)
-        #showtimes_srl = ShowtimeSerializer(showtimes, many=True)
-        return Response({"movie": movie, "showtimes":showtimes, "showtimes_per_day":showtimes_per_day}, template_name='api/movie_details.html')
+        movie_srl = MovieSerializer(movie)
+        return Response({"movie": movie_srl.data, "showtimes": self.get_showtimes(movie)})
+
 
 # Seat reservation page. List all showtime's seats.
 class ShowtimeSeats(APIView):
@@ -158,8 +154,18 @@ class Register(generics.CreateAPIView):
 # Generics.
 
 class MovieList(generics.ListAPIView):
-    queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = Movie.objects.all()
+        category = self.request.query_params.get("category")
+        print(MOVIE_GENRES.values())
+        if category is not None:
+            if category not in MOVIE_GENRES.values():
+                raise Http404
+            queryset = queryset.filter(genre=category)
+        return queryset
 
 
 class SeatListCreate(generics.ListAPIView):
@@ -177,9 +183,10 @@ class ShowtimeListCreate(generics.ListAPIView):
     serializer_class = ShowtimeSerializer
 
 
-class UserList(generics.ListAPIView):
+class UserListCreate(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [AllowAny]
 
 
 class UserDetail(generics.RetrieveAPIView):

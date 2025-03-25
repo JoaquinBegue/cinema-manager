@@ -11,6 +11,7 @@ urlpatterns = [
     path("seats/", views.SeatListCreate.as_view(), name="seat-list-create"),
     path("reservations/", views.ReservationListCreate.as_view(), name="reservation-list-create"),
     path("showtimes/", views.ShowtimeListCreate.as_view(), name="showtime-list-create"),
+    path("users/", views.UserListCreate.as_view(), name="user-list-create"),
 
     # Custom.
     path("movie/<int:pk>/", views.MovieDetails.as_view(), name="movie-details"),

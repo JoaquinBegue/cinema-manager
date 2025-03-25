@@ -119,15 +119,7 @@ def create_reservations(showtime, user):
 
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-
-
-def test():
-    content_type = ContentType.objects.get_for_model(User)
-    permissions = Permission.objects.filter(
-        content_type=content_type,
-    )
-    for p in permissions.all():
-        print(p)
+    
 
 def init_db():
     m = create_movies()
