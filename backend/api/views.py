@@ -172,6 +172,11 @@ class UserList(generics.ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
+# Showtime creation.
+class ShowtimeCreate(APIView):
+    permission_classes = [IsAuthenticated]
+    
+
 
     # GENERICS.
 
