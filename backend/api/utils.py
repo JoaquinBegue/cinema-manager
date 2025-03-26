@@ -3,7 +3,6 @@ from django.utils import timezone
 from .models import *
 from datetime import datetime, timedelta
 from random import choice
-from rest_framework.test import APIRequestFactory
 
 ### WORKFLOW
 

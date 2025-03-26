@@ -1,0 +1,4 @@
+Showtime creation:
+    1. Display movies and auditoriums.
+    2. Display auditorium schedule availability.
+    3. 

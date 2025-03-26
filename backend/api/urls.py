@@ -17,6 +17,8 @@ urlpatterns = [
 
     # Admin.
     path("admin/create-movie/", views.MovieCreate.as_view(), name="create-movie"),
+    path("admin/create-showtime/<int:auditorium>/", views.ShowtimeCreate.as_view(), name="create-showtime-get"),
+    path("admin/create-showtime/", views.ShowtimeCreate.as_view(), name="create-showtime-post"),
     path("admin/user-list/", views.UserList.as_view(), name="user-list"),
     
     # Generics.

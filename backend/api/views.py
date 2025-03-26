@@ -1,5 +1,5 @@
 # Python stuff
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice
 
 # Django stuff
@@ -20,7 +20,8 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from .models import Movie, Seat, Reservation, Showtime, MOVIE_GENRES
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
 
-    # AUTHENTICATION.
+
+### AUTHENTICATION ###
 
 # Register.
 class Register(generics.CreateAPIView):
@@ -50,7 +51,6 @@ class MovieList(generics.ListAPIView):
 class MovieDetails(APIView):
     """Returns data from the requested movie, such as movie info and the available showtimes."""
     permission_classes = [AllowAny]
-
 
     def get_movie(self, pk):
         try:
@@ -158,7 +158,7 @@ class Reserve(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-    # ADMIN
+### ADMIN ###
 
 # Movie creation.
 class MovieCreate(generics.CreateAPIView):
@@ -175,15 +175,43 @@ class UserList(generics.ListAPIView):
 # Showtime creation.
 class ShowtimeCreate(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get_movie(self, pk):
+        try:
+            m = Movie.objects.get(pk=pk)
+            return m
+        except Movie.DoesNotExist:
+            raise Http404
+  
+    def get(self, request, auditorium):
+        showtimes = Showtime.objects.filter(auditorium=auditorium, start__gt=timezone.now())
+        return Response({"showtimes": ShowtimeSerializer(showtimes, many=True).data})
+           
+    def post(self, request):
+        """Creates a new showtime for the given movie."""
+        movie = self.get_movie(request.data["movie"])
+        auditorium = request.data["auditorium"]
+        start = datetime.strptime(request.data["start"], "%Y-%m-%dT%H:%M")
+        end = start + timedelta(minutes=movie.duration + 15) 
+        
+        # Check availability of given schedule.
+        showtimes = self.get_showtimes(auditorium)
+        for showtime in showtimes:
+            # If start or end of showtime colides with any showtime, return error.
+            if start >= showtime.start and start <= showtime.end or end >= showtime.start and end <= showtime.end:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+
     
 
+### GENERICS ###
 
-    # GENERICS.
 
 class MovieListCreate(generics.ListCreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticated]
+
 
 class SeatListCreate(generics.ListAPIView):
     queryset = Seat.objects.all()
@@ -198,6 +226,7 @@ class ReservationListCreate(generics.ListAPIView):
 class ShowtimeListCreate(generics.ListAPIView):
     queryset = Showtime.objects.all()
     serializer_class = ShowtimeSerializer
+    permission_classes = [AllowAny]
 
 
 class UserListCreate(generics.ListCreateAPIView):
