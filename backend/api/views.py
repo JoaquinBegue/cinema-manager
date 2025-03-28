@@ -40,11 +40,11 @@ class MovieList(generics.ListAPIView):
     def get_queryset(self):
         queryset = Movie.objects.all()
         category = self.request.query_params.get("category")
-        print(MOVIE_GENRES.values())
         if category is not None:
             if category not in MOVIE_GENRES.values():
                 raise Http404
             queryset = queryset.filter(genre=category)
+        print(queryset)
         return queryset
 
 # Movie page. Get movie info and list all showtimes.

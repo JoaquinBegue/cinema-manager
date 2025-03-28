@@ -3,6 +3,8 @@ Changelog
 26-03-25
 
     Changes:
+    - Completed ShowtimeCreate view.
+    - Organized http files into a folder.
     
 
 21-03-25
