@@ -1,5 +1,16 @@
 Changelog
 
+28-03-25
+    
+    Changes:
+    - Added Register, Login, Logout, Home, and MovieDetails pages.
+
+27-03-25
+
+    Changes:
+    - Added base react frontend.
+
+
 26-03-25
 
     Changes:

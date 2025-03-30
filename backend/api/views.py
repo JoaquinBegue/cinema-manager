@@ -44,7 +44,6 @@ class MovieList(generics.ListAPIView):
             if category not in MOVIE_GENRES.values():
                 raise Http404
             queryset = queryset.filter(genre=category)
-        print(queryset)
         return queryset
 
 # Movie page. Get movie info and list all showtimes.

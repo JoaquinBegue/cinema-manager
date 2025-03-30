@@ -57,25 +57,27 @@ def create_movies():
     return movies
 
 # SHOWTIMES
-def create_showtimes(movie):
+def create_showtimes():
     """Create 15 showtimes for the provided movie. 3 showtimes per day for 5 days."""
+    movies = Movie.objects.all()
     showtimes = []
-    start = timezone.make_aware(datetime.now())
-    for day in range(5):
-        movie_start = start
-        for showtime in range(3):
-            movie_duration = timedelta(minutes=movie.duration) + timedelta(minutes=15)
-            end = movie_start + movie_duration
-            s = Showtime.objects.create(
-                movie=movie,
-                auditorium=1,
-                start=movie_start,
-                end=end,
-                status="available"
-            )
-            showtimes.append(s)
-            movie_start += movie_duration
-        start += timedelta(days=1)
+    for movie in movies:
+        start = timezone.make_aware(datetime.now())
+        for day in range(5):
+            movie_start = start
+            for showtime in range(3):
+                movie_duration = timedelta(minutes=movie.duration) + timedelta(minutes=15)
+                end = movie_start + movie_duration
+                s = Showtime.objects.create(
+                    movie=movie,
+                    auditorium=1,
+                    start=movie_start,
+                    end=end,
+                    status="available"
+                )
+                showtimes.append(s)
+                movie_start += movie_duration
+            start += timedelta(days=1)
 
     return showtimes
 
