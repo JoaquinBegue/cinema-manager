@@ -1,5 +1,6 @@
 // Import necessary dependencies
 import { useState } from 'react';
+import Container from 'react-bootstrap/Container';
 import Carousel from 'react-bootstrap/Carousel';
 import "../styles/ShowtimeSelector.css";
 
@@ -24,21 +25,26 @@ function ShowtimeSelector({ showtimes }) {
       {/* Map through each day and its showtimes */}
       {Object.entries(showtimes).map(([day, dayShowtimes], idx) => (
         <Carousel.Item key={idx}>
-          <Carousel.Caption>
-            {/* Display the day */}
-            <h3>{day}</h3>
-            {/* Container for all showtimes of the current day */}
-            <div className="showtimes-container">
-              {/* Map through individual showtimes for the current day */}
+          <div className="showtime-slide">
+            {/* Day caption now appears above */}
+            <div className="day-header">
+              <h3>{day}</h3>
+            </div>
+            
+            {/* Container for showtimes below the day */}
+            <Container className="showtimes-container">
               {dayShowtimes.map((showtime, showIdx) => (
                 <div key={showIdx} className="showtime-item">
-                  {/* Display the time for each showtime slot */}
                   <p>{showtime.time}</p>
-                  {/* Note: Additional showtime properties can be added here */}
                 </div>
               ))}
-            </div>
-          </Carousel.Caption>
+              {dayShowtimes.map((showtime, showIdx) => (
+                <div key={showIdx} className="showtime-item">
+                  <p>{showtime.time}</p>
+                </div>
+              ))}
+            </Container>
+          </div>
         </Carousel.Item>
       ))}
     </Carousel>

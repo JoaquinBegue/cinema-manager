@@ -26,6 +26,7 @@ body {
     height: 30rem !important;
     margin: 20px !important;
     margin-top: 0px !important;
+    cursor: pointer;
 }
 
 .movie-card-body > .card-title {

@@ -1,3 +1,82 @@
+/* Set base styles for the carousel */
+.carousel {
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    height: auto;
+}
+
+/* Style the carousel items */
+.carousel-item {
+    padding: 2rem;
+    width: 100%;
+    height: auto;
+}
+
+/* Container for showtimes */
+.showtimes-container {
+    display: block;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    width: 100%;
+}
+
+/* Individual showtime items */
+.showtime-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1rem 2rem;
+    margin: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.showtime-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.showtime-item p {
+    margin: 0;
+    color: white;
+    font-size: 1.1rem;
+}
+
+/* Style the carousel caption */
+.carousel-caption {
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1rem;
+}
+
+.carousel-caption h3 {
+    color: white;
+    margin-bottom: 1rem;
+}
+
+/* Style the scrollbar for the showtimes container */
+.showtimes-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.showtimes-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.showtimes-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.showtimes-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
 .showtimes {
     width: 100%;
     height: 100px;
@@ -9,3 +88,8 @@
     height: 300px;
     background-color: #000;
 }
+
+.showtimes-container {
+    height: 100% !important;   
+}
+
