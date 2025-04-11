@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import NavBar from "../components/NavBar";
 import ShowtimeSelector from "../components/ShowtimeSelector";
+import SeatSelector2 from "../components/SeatSelector2";
 
 import "../styles/MovieDetails.css";
 
@@ -17,6 +18,7 @@ function MovieDetails() {
   // State variables to store movie details and showtimes
   const [movie, setMovie] = useState([]);
   const [showtimes, setShowtimes] = useState([]);
+  const [selectedShowtimeId, setSelectedShowtimeId] = useState(null);
 
   // Fetch movie data when component mounts
   useEffect(() => {
@@ -32,6 +34,11 @@ function MovieDetails() {
         setShowtimes(data.showtimes);
       })
       .catch((err) => alert(err));
+  };
+
+  // Handle showtime selection
+  const handleShowtimeSelect = (showtimeId) => {
+    setSelectedShowtimeId(showtimeId);
   };
 
   return (
@@ -57,7 +64,15 @@ function MovieDetails() {
             {/* Showtimes section */}
             <div className="showtimes">
               <h3>Showtimes</h3>
-              <ShowtimeSelector showtimes={showtimes} />
+              <ShowtimeSelector 
+                showtimes={showtimes} 
+                onShowtimeSelect={handleShowtimeSelect} 
+              />
+              {selectedShowtimeId && (
+                <div className="mt-3">
+                  <SeatSelector2 showtimeId={selectedShowtimeId} />
+                </div>
+              )}
             </div>
           </Col>
 

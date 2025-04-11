@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import MovieDetails from "./pages/MovieDetails";
+import SelectSeats from "./pages/SelectSeats";
 
 function Logout() {
   localStorage.clear();
@@ -25,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
+          <Route path="/showtime/:id" element={<SelectSeats />} />
           
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterAndLogout />} />

@@ -94,6 +94,9 @@ class ShowtimeSeats(APIView):
     def get(self, request, pk, format=None):
         showtime = self.get_showtime(pk)
         showtime_srl = ShowtimeSerializer(showtime)
+
+        movie = showtime.movie
+        movie_srl = MovieSerializer(movie)
         
         seats = Seat.objects.filter(auditorium=showtime.auditorium)
         seats_srl = SeatSerializer(seats, many=True, context={"showtime": showtime})
@@ -104,7 +107,7 @@ class ShowtimeSeats(APIView):
             else:
                 seats_by_row[seat["row"]] = [seat]
 
-        return Response({"showtime": showtime_srl.data, "seats": seats_by_row})
+        return Response({"showtime": showtime_srl.data, "movie": movie_srl.data, "seats": seats_by_row})
 
 # Reservation endpoint.
 class Reserve(APIView):
