@@ -7,9 +7,9 @@ import Modal from 'react-bootstrap/Modal';
 import Container from 'react-bootstrap/Container';
 import SeatSelector from "./SeatSelector";
 
-import "../styles/SelectSeats.css";
+import "../styles/SeatSelectorModal.css";
 
-function SeatSelector2({ showtimeId }) {
+function SeatSelectorModal({ showtimeId }) {
   const [show, setShow] = useState(false);
   const [showtime, setShowtime] = useState({});
   const [movie, setMovie] = useState({});
@@ -25,9 +25,10 @@ function SeatSelector2({ showtimeId }) {
   const getSeats = () => {
     if (!showtimeId) return;
     
-    api.get(`/api/showtime-seats/${showtimeId}/`)
+    api.get(`/showtime-seats/${showtimeId}/`)
       .then((res) => res.data)
       .then((data) => {
+        console.log(data)
         setShowtime(data.showtime);
         setMovie(data.movie);
         setSeats(data.seats);
@@ -48,20 +49,16 @@ function SeatSelector2({ showtimeId }) {
         Select Seats
       </Button>
 
-      <Modal show={show} onHide={handleClose} size="lg" centered>
+      <Modal show={show} onHide={handleClose} size="lg" centered dialogClassName="seat-selector-modal">
         <Modal.Header closeButton>
-          <Modal.Title>{movie.title} - Select Your Seats</Modal.Title>
+          <Modal.Title>Select Your Seats</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="seat-selection">
             <div className="seats-container">
               <div className="screen"></div>
               
-              {seats.length > 0 ? (
-                <SeatSelector seatsByRow={seats} />
-              ) : (
-                <p className="text-center">Loading seats...</p>
-              )}
+              <SeatSelector seatsByRow={seats} />
 
               <ul className="showcase">
                 <li>
@@ -93,4 +90,4 @@ function SeatSelector2({ showtimeId }) {
   );
 }
 
-export default SeatSelector2;
+export default SeatSelectorModal;

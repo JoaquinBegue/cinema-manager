@@ -5,27 +5,30 @@ import api from "../api";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+
 import NavBar from "../components/NavBar";
 import ShowtimeSelector from "../components/ShowtimeSelector";
-import SeatSelector2 from "../components/SeatSelector2";
+import SeatSelectorModal from "../components/SeatSelectorModal";
+import AuthModal from '../components/AuthModal';
 
 import "../styles/MovieDetails.css";
 
-// MovieDetails component - displays detailed information about a specific movie
+// MovieDetails component - displays detailed information about a specific movie.
 function MovieDetails() {
-  // Get movie ID from URL parameters
+  // Get movie ID from URL parameters.
   const { id } = useParams();
-  // State variables to store movie details and showtimes
+  // State variables to store movie details and showtimes.
   const [movie, setMovie] = useState([]);
   const [showtimes, setShowtimes] = useState([]);
   const [selectedShowtimeId, setSelectedShowtimeId] = useState(null);
 
-  // Fetch movie data when component mounts
+  // Fetch movie data when component mounts.
   useEffect(() => {
     getMovie();
   }, []);
 
-  // Function to fetch movie details and showtimes from the API
+  // Function to fetch movie details and showtimes from the API.
   const getMovie = () => {
     const res = api.get(`/api/movie/${id}/`)
       .then((res) => res.data)
@@ -36,10 +39,31 @@ function MovieDetails() {
       .catch((err) => alert(err));
   };
 
-  // Handle showtime selection
+  // Handle showtime selection.
   const handleShowtimeSelect = (showtimeId) => {
     setSelectedShowtimeId(showtimeId);
   };
+
+  // Auth modal related.
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMethod, setAuthMethod] = useState('login');
+
+  const handleAuthClick = (method) => {
+    setAuthMethod(method);
+    setShowAuthModal(true);
+  };
+
+  let button;
+  if (selectedShowtimeId && localStorage.getItem('access')) {
+    button = <SeatSelectorModal showtimeId={selectedShowtimeId} />
+  }
+  else if (selectedShowtimeId && !localStorage.getItem('access')) {
+    button = <>
+      <p>Log in to select seats</p>
+      <Button onClick={() => handleAuthClick('login')}>Log In</Button>
+    </>
+  }
+
 
   return (
     <>
@@ -68,11 +92,9 @@ function MovieDetails() {
                 showtimes={showtimes} 
                 onShowtimeSelect={handleShowtimeSelect} 
               />
-              {selectedShowtimeId && (
-                <div className="mt-3">
-                  <SeatSelector2 showtimeId={selectedShowtimeId} />
-                </div>
-              )}
+              <div className="mt-3">
+                {button}
+              </div>
             </div>
           </Col>
 
@@ -93,6 +115,7 @@ function MovieDetails() {
           </Col>
         </Row>
       </Container>
+      <AuthModal show={showAuthModal} onShow={setShowAuthModal} method={authMethod} />
     </>
   );
 }

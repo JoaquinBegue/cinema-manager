@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
 
 import Form from 'react-bootstrap/Form';
 const todaysDate = new Date();
@@ -39,18 +38,10 @@ function ShowtimeSelector({ showtimes, onShowtimeSelect }) {
     setSelectedDay(e.target.value);
   };
 
-  const navigate = useNavigate();
-  
   const handleClick = (e) => {
     const showtimeId = e.target.id.split('-')[1];
     
-    if (onShowtimeSelect) {
-      // If onShowtimeSelect prop is provided, call it with the showtime ID
-      onShowtimeSelect(showtimeId);
-    } else {
-      // Otherwise, navigate to the showtime page (for backwards compatibility)
-      navigate(`/showtime/${showtimeId}`);
-    }
+    onShowtimeSelect(showtimeId);
   };
 
   return (
