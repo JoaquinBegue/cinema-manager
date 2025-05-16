@@ -19,7 +19,7 @@ POST http://localhost:8000/api/auth/token/refresh/
 content-type: application/json
 
 {
-    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0MjY3OTc1NCwiaWF0IjoxNzQyNTkzMzU0LCJqdGkiOiIzYzRkYTNhNzJlNzU0MDA2OTMxZWE3NzBlMTM4NDFkMCIsInVzZXJfaWQiOjN9.RRAKuCvDOAH6slJCljfp32YjBCPhj9eOfwfqIlktXe8"
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0NTcwMzYyOCwiaWF0IjoxNzQ1NjE3MjI4LCJqdGkiOiI2OWRlNWU5NGEzMzI0ZTA0YjlhZTdjZTM5OWQwODQ4MyIsInVzZXJfaWQiOjN9._DtG1J5lXhO8iILm39PPIjBKSytvCsrkjS-urthMoF0"
 }
 
 ### 1. Index, get movies:

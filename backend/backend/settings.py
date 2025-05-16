@@ -26,13 +26,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
+    #"DEFAULT_PERMISSION_CLASSES": [
+    #    "rest_framework.permissions.IsAuthenticated",
+    #],
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -78,8 +78,6 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin', # Admin page styling.
-    'livereload', # DEBUG.
     # Django stuff.
     'django.contrib.admin',
     'django.contrib.auth',
@@ -92,13 +90,10 @@ INSTALLED_APPS = [
     # Third party apps.
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
-    'corsheaders',
-    
-    'debug_toolbar', # DEBUG.
+    'corsheaders',   
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -107,7 +102,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'livereload.middleware.LiveReloadScript', # DEBUG
 ]
 
 ROOT_URLCONF = 'backend.urls'

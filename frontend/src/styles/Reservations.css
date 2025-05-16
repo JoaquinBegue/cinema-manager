@@ -1,0 +1,48 @@
+.reservations {
+    width: 90%;
+    margin-top: 30px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.reservations-title {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.reservation-card {
+    background-color: black !important;
+    opacity: 0.8 !important;
+    color: white !important;
+    width: 18rem !important;
+    margin: 20px !important;
+    margin-top: 0px !important;
+}
+
+.reservation-code {
+    opacity: 1 !important;
+    border-radius: 5px;
+}
+.reservation-code.valid {
+    background-color: green;
+}
+
+.reservation-code.expired {
+    background-color: white;
+}
+
+.reservation-code.cancelled {
+    background-color: red;
+}
+
+.reservation-card-body > .card-title {
+    opacity: 1 !important;
+    text-overflow: clip;
+    overflow: hidden;
+    text-align: center;
+    white-space: nowrap;
+    width: 100%;
+}

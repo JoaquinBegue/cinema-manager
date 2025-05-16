@@ -1,3 +1,11 @@
-Axios:
-    A package that manages the request made to the backend. In this project
-    is used to include the JWT tokens into the request's headers.
+TODO: Main
+- Add loading indicators to:
+    - Components that rely on user authentication status.
+    - Checkout page.
+
+- Fix multiple requesting.
+
+Big and complex:
+- 4. Include email system (When creation an account and making reservations).
+- 5. Add admin page.
+- 6. Add payment system.

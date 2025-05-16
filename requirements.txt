@@ -10,6 +10,3 @@ psycopg2-binary
 python-dotenv
 
 pillow
-
-django-jazzmin
-django-debug-toolbar

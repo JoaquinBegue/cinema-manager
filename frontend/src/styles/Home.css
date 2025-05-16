@@ -1,0 +1,26 @@
+.movies {
+    width: 90%;
+    margin-top: 30px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.movie-card {
+    background-color: black !important;
+    opacity: 0.8 !important;
+    color: white !important;
+    width: 18rem !important;
+    height: 30rem !important;
+    margin: 20px !important;
+    margin-top: 0px !important;
+    cursor: pointer;
+}
+
+.movie-card-body > .card-title {
+    opacity: 1 !important;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: center;
+    white-space: nowrap;
+    width: 100%;
+}

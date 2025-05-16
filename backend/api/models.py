@@ -51,12 +51,33 @@ class Seat(m.Model):
     
 
 class Reservation(m.Model):
+    code = m.CharField(max_length=11, unique=True, editable=False)
     user = m.ForeignKey(User, related_name="reservations", on_delete=m.CASCADE)
     showtime = m.ForeignKey("Showtime", related_name="reservations", on_delete=m.CASCADE)
     seats = m.ManyToManyField(Seat, related_name="reservations", blank=True)
+    status = m.CharField(max_length=9, default="valid")
+
+    def check_status(self):
+        if self.showtime.status == "expired":
+            self.status = "expired"
+            self.save()
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            # Generate code format: YYMMDDSSS.
+            # YY = Year, MM = Month, DD = Day, SSS = Sequential number.
+            date = self.showtime.start.strftime("%y%m%d")
+
+            # Get count of reservations plus 1.
+            count = Reservation.objects.all().count() + 1
+            
+            # Combine date and sequence (padded to 3 digits).
+            self.code = f"{date}{str(count).zfill(3)}"
+            
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"User: {self.user}; Showtime: {self.showtime.start}; Seats: {self.seats.all()}"
+        return f"Code: {self.code}; User: {self.user}; Showtime: {self.showtime.start}"
 
 
 class Showtime(m.Model):
@@ -75,11 +96,11 @@ class Showtime(m.Model):
     auditorium = m.IntegerField()
     start = m.DateTimeField()
     end = m.DateTimeField()
-    capacity = m.IntegerField(default=20)
+    capacity = m.IntegerField(default=48)
     status = m.CharField(max_length=10, choices=SHOWTIME_STATUS)
 
     def __str__(self) -> str:
-        return f"{self.movie.title}; {self.auditorium}; start={self.start}:{self.start.minute}; end={self.end.hour}:{self.end.minute}"
+        return f"{self.id}; {self.movie.title}; {self.auditorium}; start={self.start}:{self.start.minute}; end={self.end.hour}:{self.end.minute}"
     
     def is_available(self, datetime, seats_amount):
         """Checks that the showtime status is available. A showtime will be available if:

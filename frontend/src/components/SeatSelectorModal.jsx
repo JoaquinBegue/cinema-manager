@@ -1,11 +1,16 @@
-import { useState, useEffect } from 'react';
+// TODO: Fix bug (when the user selects a showtime and then changes the day,
+// the showtime that is in the same position as the one that the user selected
+// appears selected too. but the selected showtime in the component state remains
+// the same. so the user is able to select seats for a showtime that is not the
+// one to appears to be selected.
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Container from 'react-bootstrap/Container';
-import SeatSelector from "./SeatSelector";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import Col from "react-bootstrap/Col";
 
 import "../styles/SeatSelectorModal.css";
 
@@ -14,21 +19,17 @@ function SeatSelectorModal({ showtimeId }) {
   const [showtime, setShowtime] = useState({});
   const [movie, setMovie] = useState({});
   const [seats, setSeats] = useState([]);
+  const [selectedSeats, setSelectedSeats] = useState([]);
   const navigate = useNavigate();
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => {
-    setShow(true);
-    getSeats();
-  };
-
+  // Get seats for selected showtime.
   const getSeats = () => {
     if (!showtimeId) return;
-    
-    api.get(`/showtime-seats/${showtimeId}/`)
+
+    api
+      .get(`/api/showtime/${showtimeId}/`)
       .then((res) => res.data)
       .then((data) => {
-        console.log(data)
         setShowtime(data.showtime);
         setMovie(data.movie);
         setSeats(data.seats);
@@ -36,11 +37,38 @@ function SeatSelectorModal({ showtimeId }) {
       .catch((err) => alert(err));
   };
 
+  // Handle seat selection.
+  const handleSeatClick = (e) => {
+    const seatId = e.target.children[0].value;
+
+    setSelectedSeats((prevSelectedSeats) => {
+      // If the seat is already selected, remove it from the list.
+      if (prevSelectedSeats.includes(seatId)) {
+        e.target.classList.remove("selected");
+        return prevSelectedSeats.filter((id) => id !== seatId);
+        // Else, add it to the list.
+      } else {
+        e.target.classList.add("selected");
+        return [...prevSelectedSeats, seatId];
+      }
+    });
+  };
+
+  // Handle booking selected seats.
   const handleBookSeats = () => {
     // Add logic for booking selected seats
-    handleClose();
-    // Optionally navigate to checkout or confirmation page
-    // navigate(`/checkout/${showtimeId}`);
+    navigate(
+      `/checkout/${showtimeId}/${encodeURIComponent(
+        JSON.stringify(selectedSeats)
+      )}`
+    );
+  };
+
+  // Modal related.
+  const handleClose = () => setShow(false);
+  const handleShow = () => {
+    setShow(true);
+    getSeats();
   };
 
   return (
@@ -49,16 +77,44 @@ function SeatSelectorModal({ showtimeId }) {
         Select Seats
       </Button>
 
-      <Modal show={show} onHide={handleClose} size="lg" centered dialogClassName="seat-selector-modal">
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="lg"
+        centered
+        dialogClassName="seat-selector-modal"
+      >
         <Modal.Header closeButton>
-          <Modal.Title>Select Your Seats</Modal.Title>
+          <Modal.Title>
+            Select your seats for {movie.title} at {showtime.start_time}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="seat-selection">
             <div className="seats-container">
               <div className="screen"></div>
-              
-              <SeatSelector seatsByRow={seats} />
+
+              <div className="container">
+                {Object.entries(seats).map(([row, seats], idx) => (
+                  <div key={idx} className="row">
+                    {seats.map((seat, seatIdx) => (
+                      <Col
+                        key={seatIdx}
+                        className={seat.available ? "seat" : "seat occupied"}
+                        onClick={handleSeatClick}
+                      >
+                        {seat.row}
+                        {seat.column}
+                        <input
+                          type="hidden"
+                          id="seat-id"
+                          value={seat.id}
+                        ></input>
+                      </Col>
+                    ))}
+                  </div>
+                ))}
+              </div>
 
               <ul className="showcase">
                 <li>

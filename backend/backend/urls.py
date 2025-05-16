@@ -9,11 +9,10 @@ from api.admin import cinema_admin_site
 
 urlpatterns = [
     # API.
-    path("", include("api.urls")),
     path("api/", include("api.urls")),
 
     # Auth.
-    path("api/auth/", include("rest_framework.urls")),    
+    path("api-auth/", include("rest_framework.urls")),    
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

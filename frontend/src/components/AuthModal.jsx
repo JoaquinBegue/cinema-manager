@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import "../styles/Form.css";
+import "../styles/AuthForm.css";
 
 import LoadingIndicator from "./LoadingIndicator";
-import Modal from 'react-bootstrap/Modal';
+import Modal from "react-bootstrap/Modal";
 
-function AuthModal({ show: externalShow, onShow, method }) {
+function AuthModal({ show: externalShow, onShow, method, onSuccess }) {
   // Form related.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,10 +30,17 @@ function AuthModal({ show: externalShow, onShow, method }) {
     e.preventDefault();
 
     try {
-      const res = await api.post(route, { username: email, email, first_name: firstName, last_name: lastName, password });
+      const res = await api.post(route, {
+        username: email,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        password,
+      });
       if (method === "login") {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+        onSuccess?.();
       } else {
         navigate("/login");
       }
@@ -43,7 +50,7 @@ function AuthModal({ show: externalShow, onShow, method }) {
       setLoading(false);
     }
 
-    handleClose()
+    handleClose();
   };
 
   // Modal related.

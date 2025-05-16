@@ -15,7 +15,17 @@
     height: auto;  /* Allow natural height */
 }
 
+.showtime {
+    cursor: pointer;
+}
+
+.showtime.selected {
+    background-color: white;
+    color: black;
+}
+
 .showtime:hover {
     background-color: white;
     color: black;
+    cursor: pointer;
 }

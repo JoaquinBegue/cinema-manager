@@ -3,8 +3,6 @@ from datetime import datetime, timedelta
 from random import choice
 
 # Django stuff
-from django.shortcuts import render
-from django.http import Http404
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -14,7 +12,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.exceptions import NotFound
 
 # API stuff
 from .models import Movie, Seat, Reservation, Showtime, MOVIE_GENRES
@@ -30,7 +28,7 @@ class Register(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
-    # USER REQUEST FLOW.
+### USER REQUEST FLOW ###
 
 # Index. List all movies.
 class MovieList(generics.ListAPIView):
@@ -42,7 +40,7 @@ class MovieList(generics.ListAPIView):
         category = self.request.query_params.get("category")
         if category is not None:
             if category not in MOVIE_GENRES.values():
-                raise Http404
+                raise NotFound("Category not found.")
             queryset = queryset.filter(genre=category)
         return queryset
 
@@ -55,7 +53,7 @@ class MovieDetails(APIView):
         try:
             return Movie.objects.get(pk=pk)
         except Movie.DoesNotExist:
-            raise Http404
+            raise NotFound("Movie not found.")
     
     def get_showtimes(self, movie):
         showtimes = Showtime.objects.filter(movie=movie, status="available").order_by("start")
@@ -81,15 +79,15 @@ class MovieDetails(APIView):
         return Response({"movie": movie_srl.data, "showtimes": self.get_showtimes(movie)})
 
 # Seat reservation page. List all showtime's seats.
-class ShowtimeSeats(APIView):
-    """Returns all the seats for a requested showtime."""
+class ShowtimeDetails(APIView):
+    """Returns info about the requested showtime and its seats."""
     permission_classes = [AllowAny]
 
     def get_showtime(self, pk):
         try:
             return Showtime.objects.get(pk=pk, status="available")
         except Showtime.DoesNotExist:
-            raise Http404
+            raise NotFound("Showtime not found.")
     
     def get(self, request, pk, format=None):
         showtime = self.get_showtime(pk)
@@ -100,6 +98,8 @@ class ShowtimeSeats(APIView):
         
         seats = Seat.objects.filter(auditorium=showtime.auditorium)
         seats_srl = SeatSerializer(seats, many=True, context={"showtime": showtime})
+
+        # Group seats by row.
         seats_by_row = {}
         for seat in seats_srl.data:
             if seat["row"] in seats_by_row:
@@ -111,29 +111,47 @@ class ShowtimeSeats(APIView):
 
 # Reservation endpoint.
 class Reserve(APIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_showtime(self, pk, seats_amount):
         try:
             showtime = Showtime.objects.get(pk=pk)
             if showtime.is_available(timezone.now(), seats_amount): return showtime
             else: 
-                print("Showtime not available", showtime.start)
-                raise Http404
+                raise NotFound("Showtime not available.")
             
         except Showtime.DoesNotExist:
-            print("Showtime.DoesNotExist")
-            raise Http404
+            raise NotFound("Showtime not found.")
 
     def get_seat(self, pk, showtime):
         try:
             seat = Seat.objects.get(pk=pk)
             if seat.is_available(showtime): return seat
-            else: raise Http404
+            else: raise NotFound(f"Seat {pk} not available.")
 
         except Seat.DoesNotExist:
-            print("Seat.DoesNotExist")
-            raise Http404
+            raise NotFound(f"Seat {pk} not found.")
+
+    def get(self, request):
+        # Get the GET data.
+        showtime = request.query_params["showtime"]
+        seats = request.query_params["seats"].split(",")
+        seats = [int(s) for s in seats]
+
+        # Get the showtime.
+        showtime = self.get_showtime(showtime, len(seats))
+
+        # Retrieve all seats.
+        validated_seats = []
+        for seat in seats:
+            s = self.get_seat(seat, showtime)
+            validated_seats.append(s)
+            
+        # Update showtime capacity.
+        showtime.capacity -= len(validated_seats)
+        showtime.save()
+
+        return Response({"showtime": ShowtimeSerializer(showtime).data, "seats": SeatSerializer(validated_seats, many=True, context={"showtime": showtime}).data})
 
     def post(self, request):
         # Get the POST data.
@@ -149,15 +167,23 @@ class Reserve(APIView):
             s = self.get_seat(seat, showtime)
             validated_seats.append(s)
 
-        ### TEMPORAL: Get a dummy user.
-        user = choice(User.objects.all())
+        user = request.user
 
         # Once all seats are successfully retrieved, create the reservation.
         r = Reservation.objects.create(user=user, showtime=showtime)
         r.seats.set(validated_seats)
         r.save()
 
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(data={"code": r.code}, status=status.HTTP_201_CREATED)
+
+# List all reservations.
+class ReservationList(generics.ListAPIView):
+    serializer_class = ReservationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Reservation.objects.filter(user=self.request.user)
+        return queryset
 
 
 ### ADMIN ###
@@ -183,7 +209,7 @@ class ShowtimeCreate(APIView):
             m = Movie.objects.get(pk=pk)
             return m
         except Movie.DoesNotExist:
-            raise Http404
+            raise NotFound("Movie not found.")
   
     def get(self, request, auditorium):
         showtimes = Showtime.objects.filter(auditorium=auditorium, start__gt=timezone.now())

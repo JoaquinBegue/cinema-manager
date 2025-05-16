@@ -1,4 +1,30 @@
 Changelog
+15-05-25:
+    - Fixed alert with auth error when entering the page after the refresh token expired.
+    - Advanced on Reservations page. Created ReservationCard.
+
+08-05-25
+    Changes:
+    - Added search bar functionality.
+
+25-04-25
+    Changes:
+    - Fixed auth token updating bug. Added token validation in each request.
+    - Fixed showtime capacity amount and updating.
+    - Added reservation code creation.
+
+24-04-25
+    Changes:
+    - Combined SeatSelector and SeatSelectorModal components. Added logic to reserve
+    seats. Added a checkout page to perform the reservation.
+
+18-04-25
+    Changes:
+    - Added a Showtime selector component to let the user select a day and then
+    the showtimes of that day.
+    - Added a seat selector that appears in a modal when the user selects a showtime.
+    - Moved the auth form into a modal. Added the logic to access the modal
+    through navbar links and a button.
 
 28-03-25
     
@@ -27,11 +53,6 @@ Changelog
 
     Changes:
     - Added showtime selector and seat selection page.
-
-    TODO:
-    - Fix the DB seat quantity to match the frontend one.
-    - Fetch each displayed seat with the data sent from backend.
-    - Manage the seat selection through the seats id instead of seat number.
 
 25-02-25
 

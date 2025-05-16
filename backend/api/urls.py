@@ -12,8 +12,9 @@ urlpatterns = [
     # User request flow.
     path("movies/", views.MovieList.as_view(), name="movie-list"),
     path("movie/<int:pk>/", views.MovieDetails.as_view(), name="movie-details"),
-    path("showtime-seats/<int:pk>/", views.ShowtimeSeats.as_view(), name="showtime-seats"),
+    path("showtime/<int:pk>/", views.ShowtimeDetails.as_view(), name="showtime-details"),
     path("reserve/", views.Reserve.as_view(), name="reserve"),
+    path("reservations/", views.ReservationList.as_view(), name="reservation-list"),
 
     # Admin.
     path("admin/create-movie/", views.MovieCreate.as_view(), name="create-movie"),

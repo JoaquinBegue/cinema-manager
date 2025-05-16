@@ -1,12 +1,15 @@
+// TODO: Fix search results displaying behind some elements.
+
 // Import necessary components from react-bootstrap
-import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import { useState } from 'react';
-import AuthModal from './AuthModal';
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import { useState, useEffect } from "react";
+import AuthModal from "./AuthModal";
+import api from "../api";
+import { useNavigate } from "react-router-dom";
+import "../styles/NavBar.css";
 
 /**
  * NavBar component that displays the main navigation bar
@@ -14,18 +17,67 @@ import AuthModal from './AuthModal';
  * @param {string} props.page - Current page identifier
  */
 function NavBar({ page }) {
+  // Auth modal related.
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMethod, setAuthMethod] = useState('login');
+  const [authMethod, setAuthMethod] = useState("login");
+  // Search bar related.
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [movies, setMovies] = useState([]);
+
+  const navigate = useNavigate();
 
   const handleAuthClick = (method) => {
     setAuthMethod(method);
     setShowAuthModal(true);
   };
 
+  useEffect(() => {
+    getMovies();
+  }, []);
+
+  const searchMovies = (searchQuery) => {
+    setSearchQuery(searchQuery);
+    if (searchQuery.length > 2) {
+      let results = movies.filter((movie) =>
+        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSearchResults(results);
+      setShowResults(true);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  };
+
+  // Function to fetch movies from the API
+  const getMovies = () => {
+    const res = api
+      .get("/api/movies/")
+      .then((res) => res.data)
+      .then((data) => {
+        setMovies(data); // Update movies state with fetched data
+      })
+      .catch((err) => alert(err)); // Show alert if there's an error
+  };
+
+  const handleMovieClick = (movieId) => {
+    navigate(`/movie/${movieId}`);
+    setSearchQuery("");
+    setShowResults(false);
+  };
+
   return (
     // Main Navbar component with dark theme
+    // TODO: Center navbar brand.
     <>
-      <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
+      <Navbar
+        expand="lg"
+        className="bg-body-tertiary"
+        bg="dark"
+        data-bs-theme="dark"
+      >
         <Container fluid>
           {/* Brand logo/text that links to home page */}
           <Navbar.Brand href="/">Cinema</Navbar.Brand>
@@ -35,40 +87,71 @@ function NavBar({ page }) {
             {/* Navigation links container */}
             <Nav
               className="me-auto my-2 my-lg-0"
-              style={{ maxHeight: '100px' }}
+              style={{ maxHeight: "100px" }}
               navbarScroll
             >
               {/* Conditional rendering of Home link - only shows if not on home page */}
               {page !== "home" && <Nav.Link href="/">Home</Nav.Link>}
               {/* Login/Register links for unauthenticated users */}
-              {!localStorage.getItem('access') && (
+              {!localStorage.getItem("access") && (
                 <>
-                  <Nav.Link onClick={() => handleAuthClick('login')}>Log In</Nav.Link>
-                  <Nav.Link onClick={() => handleAuthClick('register')}>Register</Nav.Link>
+                  <Nav.Link onClick={() => handleAuthClick("login")}>
+                    Log In
+                  </Nav.Link>
+                  <Nav.Link onClick={() => handleAuthClick("register")}>
+                    Register
+                  </Nav.Link>
                 </>
               )}
-              {localStorage.getItem('access') && (
+              {localStorage.getItem("access") && (
                 <>
-                  <Nav.Link href="#">My Reservations</Nav.Link>
+                  {page != "reservations" && (
+                    <Nav.Link href="/reservations">My Reservations</Nav.Link>
+                  )}
                   <Nav.Link href="/logout">Log Out</Nav.Link>
                 </>
               )}
             </Nav>
-            {/* Search form */}
-            <Form className="d-flex">
+            {/* Search form with dropdown */}
+            <Form className="d-flex position-relative">
               <Form.Control
                 type="search"
-                placeholder="Search"
+                placeholder="Search movies..."
                 className="me-2"
                 aria-label="Search"
+                value={searchQuery}
+                onChange={(e) => searchMovies(e.target.value)}
+                onFocus={() => searchQuery.length > 2 && setShowResults(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchResults.length > 0) {
+                    e.preventDefault();
+                    handleMovieClick(searchResults[0].id);
+                  }
+                }}
               />
-              {/* Search button */}
-              <Button variant="outline-success">Search</Button>
+              {/* Search results dropdown */}
+              {showResults && searchResults.length > 0 && (
+                <div className="search-results-dropdown">
+                  {searchResults.map((movie) => (
+                    <div
+                      key={movie.id}
+                      className="search-result-item"
+                      onClick={() => handleMovieClick(movie.id)}
+                    >
+                      {movie.title}
+                    </div>
+                  ))}
+                </div>
+              )}
             </Form>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <AuthModal show={showAuthModal} onShow={setShowAuthModal} method={authMethod} />
+      <AuthModal
+        show={showAuthModal}
+        onShow={setShowAuthModal}
+        method={authMethod}
+      />
     </>
   );
 }
