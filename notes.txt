@@ -5,6 +5,8 @@ TODO: Main
 
 - Fix multiple requesting.
 
+- A bug causes a showtime to have 0 capacity, and also be displayed as available.
+
 Big and complex:
 - 4. Include email system (When creation an account and making reservations).
 - 5. Add admin page.

@@ -58,7 +58,7 @@ function SeatSelectorModal({ showtimeId }) {
   const handleBookSeats = () => {
     // Add logic for booking selected seats
     navigate(
-      `/checkout/${showtimeId}/${encodeURIComponent(
+      `/checkout/reserve/${showtimeId}/${encodeURIComponent(
         JSON.stringify(selectedSeats)
       )}`
     );

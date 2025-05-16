@@ -23,7 +23,7 @@ class SeatSerializer(serializers.ModelSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    movie = serializers.SerializerMethodField() 
+    movie_title = serializers.SerializerMethodField() 
     showtime_start = serializers.SerializerMethodField()
     showtime_auditorium = serializers.SerializerMethodField()
     seats_formatted = serializers.SerializerMethodField()
@@ -32,7 +32,7 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = "__all__"
 
-    def get_movie(self, obj):
+    def get_movie_title(self, obj):
         return obj.showtime.movie.title
 
     def get_showtime_start(self, obj):
@@ -51,11 +51,15 @@ class ReservationSerializer(serializers.ModelSerializer):
 
 
 class ShowtimeSerializer(serializers.ModelSerializer):
+    movie_title = serializers.SerializerMethodField()
     start_time = serializers.SerializerMethodField()
 
     class Meta:
         model = Showtime
-        fields = ["id", "movie", "auditorium", "start_time"]
+        fields = "__all__"
+
+    def get_movie_title(self, obj):
+        return obj.movie.title
 
     def get_start_time(self, obj):
         return obj.start.strftime("%H:%M") if obj.start else None

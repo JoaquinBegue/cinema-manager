@@ -28,7 +28,6 @@ function Reservations() {
     };
 
     fetchReservations();
-    console.log(reservations);
   }, []);
 
   return (

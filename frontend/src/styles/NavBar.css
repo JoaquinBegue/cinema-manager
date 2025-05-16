@@ -1,4 +1,23 @@
+.navbar {
+  position: relative;
+  z-index: 9999;
+}
+
+.navbar-left, .navbar-right {
+  width: 400px;
+}
+
+.navbar-right {
+  position: relative;
+  z-index: 9999;
+}
+
+.brand-logo {
+  font-weight: normal;
+}
+
 .search-results-dropdown {
+  width: 75%;
   position: absolute;
   top: 100%;
   left: 0;
@@ -8,8 +27,9 @@
   border-radius: 4px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
   margin-top: 4px;
+  opacity: 1 !important;
 }
 
 .search-result-item {

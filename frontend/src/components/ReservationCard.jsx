@@ -9,7 +9,7 @@ function ReservationCard({ reservation }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/cancel-reservation/${reservation.id}/`);
+    navigate(`/checkout/cancel-reservation/${reservation.id}/`);
   };
 
   return (
@@ -17,7 +17,7 @@ function ReservationCard({ reservation }) {
       <Card.Body className="reservation-card-body">
         <Card.Title>
           <h2 className="reservation-card-title mx-auto">
-            {reservation.movie}
+            {reservation.movie_title}
           </h2>
         </Card.Title>
         <Card.Text>
@@ -58,7 +58,7 @@ function ReservationCard({ reservation }) {
                 Yes
               </Button>
               <Button
-                variant="outline-dark mx-2"
+                variant="outline-light mx-2"
                 onClick={() => setCanceling(false)}
               >
                 No

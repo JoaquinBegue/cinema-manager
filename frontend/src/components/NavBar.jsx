@@ -1,5 +1,3 @@
-// TODO: Fix search results displaying behind some elements.
-
 // Import necessary components from react-bootstrap
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -70,7 +68,6 @@ function NavBar({ page }) {
 
   return (
     // Main Navbar component with dark theme
-    // TODO: Center navbar brand.
     <>
       <Navbar
         expand="lg"
@@ -79,14 +76,12 @@ function NavBar({ page }) {
         data-bs-theme="dark"
       >
         <Container fluid>
-          {/* Brand logo/text that links to home page */}
-          <Navbar.Brand href="/">Cinema</Navbar.Brand>
           {/* Hamburger menu toggle for mobile view */}
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
             {/* Navigation links container */}
             <Nav
-              className="me-auto my-2 my-lg-0"
+              className="navbar-left my-2 my-lg-0"
               style={{ maxHeight: "100px" }}
               navbarScroll
             >
@@ -112,12 +107,16 @@ function NavBar({ page }) {
                 </>
               )}
             </Nav>
+            {/* Brand logo/text that links to home page */}
+            <Navbar.Brand className="mx-auto my-0" href="/">
+              <h1 className="brand-logo my-0">CINEMA</h1>
+            </Navbar.Brand>
             {/* Search form with dropdown */}
-            <Form className="d-flex position-relative">
+            <Form className="navbar-right d-flex position-relative">
               <Form.Control
                 type="search"
                 placeholder="Search movies..."
-                className="me-2"
+                className="ms-auto me-2 w-75"
                 aria-label="Search"
                 value={searchQuery}
                 onChange={(e) => searchMovies(e.target.value)}
@@ -131,7 +130,7 @@ function NavBar({ page }) {
               />
               {/* Search results dropdown */}
               {showResults && searchResults.length > 0 && (
-                <div className="search-results-dropdown">
+                <div className="search-results-dropdown ms-auto me-2">
                   {searchResults.map((movie) => (
                     <div
                       key={movie.id}

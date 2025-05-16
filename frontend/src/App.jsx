@@ -20,7 +20,15 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
           <Route
-            path="/checkout/:showtimeId/:seatsIds"
+            path="/checkout/reserve/:showtimeId/:seatsIds"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout/cancel-reservation/:reservationId"
             element={
               <ProtectedRoute>
                 <Checkout />
