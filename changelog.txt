@@ -1,4 +1,11 @@
 Changelog
+17-05-25:
+    - Refactored backend code into 2 more apps: admin_api and auth_api.
+
+16-05-25:
+    - Added reservations page.
+    - Added reservation cancellation functionality.
+
 15-05-25:
     - Fixed alert with auth error when entering the page after the refresh token expired.
     - Advanced on Reservations page. Created ReservationCard.

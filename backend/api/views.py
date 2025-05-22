@@ -1,34 +1,18 @@
-# Python stuff
-from datetime import datetime, timedelta
-from random import choice
-
 # Django stuff
 from django.utils import timezone
 from django.contrib.auth.models import User
-
 
 # DRF stuff
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import NotFound
 
 # API stuff
 from .models import Movie, Seat, Reservation, Showtime, MOVIE_GENRES
-from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer, UserSerializer
+from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer
 
-
-### AUTHENTICATION ###
-
-# Register.
-class Register(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-
-
-### USER REQUEST FLOW ###
 
 # Index. List all movies.
 class MovieList(generics.ListAPIView):
@@ -221,85 +205,3 @@ class ReservationList(generics.ListAPIView):
     def get_queryset(self):
         queryset = Reservation.objects.filter(user=self.request.user).order_by("-code")
         return queryset
-
-
-### ADMIN ###
-
-# Movie creation.
-class MovieCreate(generics.CreateAPIView):
-    queryset = Movie.objects.all()
-    serializer_class = MovieSerializer
-    permission_classes = [IsAuthenticated]
-
-# User list.
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-
-# Showtime creation.
-class ShowtimeCreate(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_movie(self, pk):
-        try:
-            m = Movie.objects.get(pk=pk)
-            return m
-        except Movie.DoesNotExist:
-            raise NotFound("Movie not found.")
-  
-    def get(self, request, auditorium):
-        showtimes = Showtime.objects.filter(auditorium=auditorium, start__gt=timezone.now())
-        return Response({"showtimes": ShowtimeSerializer(showtimes, many=True).data})
-           
-    def post(self, request):
-        """Creates a new showtime for the given movie."""
-        movie = self.get_movie(request.data["movie"])
-        auditorium = request.data["auditorium"]
-        start = datetime.strptime(request.data["start"], "%Y-%m-%dT%H:%M")
-        end = start + timedelta(minutes=movie.duration + 15) 
-        
-        # Check availability of given schedule.
-        showtimes = self.get_showtimes(auditorium)
-        for showtime in showtimes:
-            # If start or end of showtime colides with any showtime, return error.
-            if start >= showtime.start and start <= showtime.end or end >= showtime.start and end <= showtime.end:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-
-    
-
-### GENERICS ###
-
-
-class MovieListCreate(generics.ListCreateAPIView):
-    queryset = Movie.objects.all()
-    serializer_class = MovieSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class SeatListCreate(generics.ListAPIView):
-    queryset = Seat.objects.all()
-    serializer_class = SeatSerializer
-
-
-class ReservationListCreate(generics.ListAPIView):
-    queryset = Reservation.objects.all()
-    serializer_class = ReservationSerializer
-
-
-class ShowtimeListCreate(generics.ListAPIView):
-    queryset = Showtime.objects.all()
-    serializer_class = ShowtimeSerializer
-    permission_classes = [AllowAny]
-
-
-class UserListCreate(generics.ListCreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer

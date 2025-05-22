@@ -7,6 +7,8 @@ TODO: Main
 
 - A bug causes a showtime to have 0 capacity, and also be displayed as available.
 
+- Add user and mail checking when registering.
+
 Big and complex:
 - 4. Include email system (When creation an account and making reservations).
 - 5. Add admin page.

@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../api";
-import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import "../styles/AuthForm.css";
 
@@ -16,10 +15,9 @@ function AuthModal({ show: externalShow, onShow, method, onSuccess }) {
   const [lastName, setLastName] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const formName = method === "login" ? "Login" : "Register";
-  const route = method === "login" ? "/api/auth/token/" : "/api/auth/register/";
+  const route = method === "login" ? "/auth/token/" : "/auth/register/";
 
   const [internalShow, setInternalShow] = useState(false);
   const show = externalShow !== undefined ? externalShow : internalShow;
@@ -37,17 +35,18 @@ function AuthModal({ show: externalShow, onShow, method, onSuccess }) {
         last_name: lastName,
         password,
       });
-      if (method === "login") {
-        localStorage.setItem(ACCESS_TOKEN, res.data.access);
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-        onSuccess?.();
-      } else {
-        navigate("/login");
-      }
+      localStorage.setItem(ACCESS_TOKEN, res.data.access);
+      localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+      onSuccess?.();
     } catch (error) {
       alert(error);
     } finally {
       setLoading(false);
+      setEmail("");
+      setPassword("");
+      setFirstName("");
+      setLastName("");
+      setPassword2("");
     }
 
     handleClose();

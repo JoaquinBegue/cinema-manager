@@ -8,11 +8,11 @@ import { jwtDecode } from "jwt-decode";
 
 // Create a separate axios instance for token refresh
 const refreshApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "/api",
+  baseURL: import.meta.env.VITE_API_URL
 });
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : "/api",
+  baseURL: import.meta.env.VITE_API_URL
 });
 
 api.interceptors.request.use(
@@ -32,7 +32,7 @@ api.interceptors.request.use(
             throw new Error('No refresh token available');
           }
           
-          const response = await refreshApi.post("/api/auth/token/refresh/", {
+          const response = await refreshApi.post("/auth/token/refresh/", {
             refresh: refreshToken
           });
           

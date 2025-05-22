@@ -1,13 +1,15 @@
-from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
 
-from api.admin import cinema_admin_site
-
-
 urlpatterns = [
+    # Auth.
+    path("auth/", include("auth_api.urls")),
+
+    # Admin.
+    path("admin/", include("admin_api.urls")),
+    
     # API.
     path("api/", include("api.urls")),
 

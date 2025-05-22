@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Movie, Seat, Reservation, Showtime
@@ -63,19 +62,3 @@ class ShowtimeSerializer(serializers.ModelSerializer):
 
     def get_start_time(self, obj):
         return obj.start.strftime("%H:%M") if obj.start else None
-
-
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "password"]
-        extra_kwargs = {"username": {"allow_null": True}, "password": {"write_only": True, "required": True}}
-
-    def create(self, validated_data):
-        password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.username = validated_data.pop("email")
-        user.set_password(password)
-        user.save()
-        return user
