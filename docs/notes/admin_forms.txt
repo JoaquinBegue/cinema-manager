@@ -17,6 +17,7 @@ SHOWTIME FORM:
         backend:
         - create a view to get the reserved times for future showtimes for the
             the selected date and auditorium.
+        - the endpoint should return an array of intervals of the starting and ending of showtimes
             
     Fields:
         - movie is a select field.

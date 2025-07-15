@@ -9,8 +9,16 @@ import "./ShowtimeForm.css";
 
 function ShowtimeForm({ mode, selectedObjectId }) {
   // Helper function to format date in ISO 8601 format
-  const formatDate = (date) => {
-    return date.toISOString();
+  const formatDate = (date, time) => {
+    const formatedDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes()
+    );
+
+    return formatedDate.toISOString();
   };
 
   // Form states.
@@ -23,6 +31,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
   // Display states.
   const [movies, setMovies] = useState([]);
   const auditoriums = [1, 2, 3, 4, 5];
+  const [reservedTimes, setReservedTimes] = useState([]);
 
   // Form data.
   const [movie, setMovie] = useState("");
@@ -78,11 +87,33 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     }
   };
 
+  // Fetch reserved times any time the auditorium or date changes.
+  useEffect(() => {
+    const fetchReservedTimes = async () => {
+      const response = await api.get(`/admin/showtimes/reserved-times/`, {
+        params: { auditorium, date: formatDate(date, time) },
+      });
+      setReservedTimes(response.data.reserved_times);
+    };
+    fetchReservedTimes();
+  }, [auditorium, date]);
+
   // Time filter function
   const filterTimes = (time) => {
     const currentDate = new Date();
     const selectedDate = new Date(time);
 
+    // Check if the selected time is reserved.
+    reservedTimes.forEach((reservedTime) => {
+      if (
+        reservedTime.start <= selectedDate &&
+        reservedTime.end >= selectedDate
+      ) {
+        return false;
+      }
+    });
+
+    // Filter out times that are before the current date.
     return currentDate.getTime() <= selectedDate.getTime();
   };
 
@@ -96,15 +127,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     const formData = {
       movie: movie,
       auditorium: auditorium,
-      start: formatDate(
-        new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
-          time.getHours(),
-          time.getMinutes()
-        )
-      ),
+      start: formatDate(date, time),
     };
 
     // Set headers.
