@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound";
 import MovieDetails from "./pages/MovieDetails";
 import Checkout from "./pages/Checkout";
 import Reservations from "./pages/Reservations";
+import Admin from "./pages/Admin";
 
 function Logout() {
   localStorage.clear();
@@ -43,6 +44,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="/admin" element={<Admin />} />
 
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />

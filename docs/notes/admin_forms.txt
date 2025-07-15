@@ -1,0 +1,43 @@
+GENERAL:
+    - if updating, get object data.
+    - display corresponding fields with object data.
+    - if updating, display object id.
+
+
+SHOWTIME FORM:
+    Datetime availability checking:
+        frontend:
+        - add an state to showtimeform component to store reserved showtimes.
+        - add an useEffect to fetch reserved showtimes when the component mounts
+            and when the auditorium or date changes.
+        - in the filter function, check if the selected datetime is in the
+            reserved showtimes array.
+        - show the available days in green and the unavailable days in grey.
+        
+        backend:
+        - create a view to get the reserved times for future showtimes for the
+            the selected date and auditorium.
+            
+    Fields:
+        - movie is a select field.
+        - auditorium is a select field.
+        - start is a datetime field.
+
+
+MOVIE FORM:
+    Fields: 
+        - title is a text field.
+        - synopsis is a text field.
+        - poster is an image field.
+        - genre is a select field.
+        - duration is an integer field.
+        - director is a text field.
+        - cast is a text field.
+        - trailer_url is a text field.
+
+
+RESERVATION FORM:
+    Fields:
+        - user_id is a integer field.
+        - showtime is a select field.
+        - seats is a select multiple field.

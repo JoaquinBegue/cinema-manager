@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from datetime import timedelta
 
 from .models import Movie, Seat, Reservation, Showtime
 

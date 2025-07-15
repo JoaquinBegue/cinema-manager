@@ -3,8 +3,3 @@ body {
     min-height: 100vh;
     margin: 0;
 }
-
-.navbar {
-    background-color: black !important;
-    color: white !important;
-}

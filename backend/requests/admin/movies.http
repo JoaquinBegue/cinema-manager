@@ -1,0 +1,57 @@
+{
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4MDQxODI4LCJpYXQiOjE3NDgwNDAxMTMsImp0aSI6IjVlNmMzODM5ZDZmMzQyZmQ4ZjBlOTNjOWM0YjRmYmZiIiwidXNlcl9pZCI6MTB9.jKkBqGKfmo8CtRSl18o7uU4bfVkX8ZbF9NiFnuPfGPc",
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0ODEyNzkyOCwiaWF0IjoxNzQ4MDQxNTI4LCJqdGkiOiI0YTkxNjUyMDZiOWM0MThhODg0NDc2NjQzMjViZGY0NiIsInVzZXJfaWQiOjEwfQ.BarduBA7KO23l1CoRqUehxIehJADLk8KWVBfT01EHks"
+}
+
+### Get Token
+POST http://localhost:8000/auth/token/
+content-type: application/json
+
+{
+    "username": "admin@example.com", "password": "12345"
+}
+
+### Refresh Token
+POST http://localhost:8000/auth/token/refresh/
+content-type: application/json
+
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0ODEyNjUxMywiaWF0IjoxNzQ4MDQwMTEzLCJqdGkiOiI0MmQxMzVjZGIyMzg0NmIwYmZlZmI1NmVlZWM3Y2Y2NiIsInVzZXJfaWQiOjEwfQ.dynlp3-sau3KAPcAcTyyvdphoDbmbyYuuL5st8rZpes"
+}
+
+### Create movie
+POST http://localhost:8000/admin/create-movie/
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ4MDQxODI4LCJpYXQiOjE3NDgwNDAxMTMsImp0aSI6IjVlNmMzODM5ZDZmMzQyZmQ4ZjBlOTNjOWM0YjRmYmZiIiwidXNlcl9pZCI6MTB9.jKkBqGKfmo8CtRSl18o7uU4bfVkX8ZbF9NiFnuPfGPc
+
+{
+    "title": "",
+    "synopsis": "",
+    "poster": null,
+    "genre": null,
+    "duration": null,
+    "director": "",
+    "cast": "",
+    "trailer_url": ""
+}
+
+### List movies
+GET http://localhost:8000/admin/get-showtimes/
+
+### Manage movie - get movie
+GET http://localhost:8000/admin/manage-movie/6/
+
+### Manage movie - update movie
+PUT http://localhost:8000/admin/manage-movie/4/
+content-type: application/json
+
+{
+  
+}
+
+### Manage movie - delete movie
+DELETE http://localhost:8000/admin/manage-movie/6/
+
+### Test
+POST http://localhost:8000/admin/create-showtime/
+content-type: application/json

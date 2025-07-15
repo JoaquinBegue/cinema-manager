@@ -1,4 +1,13 @@
 Changelog
+
+2-06-25
+    Changes:
+    - Updated Showtime model to automatically set end datetime.
+    - Refactored admin views and urls into viewsets with routers.
+    - Updated admin forms to work with viewsets.
+    - Almost finished showtime form. Still to do:
+        - Add datetime availability feature.
+
 17-05-25:
     - Refactored backend code into 2 more apps: admin_api and auth_api.
 

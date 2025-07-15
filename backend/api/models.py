@@ -95,13 +95,19 @@ class Showtime(m.Model):
     movie = m.ForeignKey(Movie, related_name="showtimes", on_delete=m.CASCADE)
     auditorium = m.IntegerField()
     start = m.DateTimeField()
-    end = m.DateTimeField()
+    end = m.DateTimeField(blank=True, null=True)
     capacity = m.IntegerField(default=48)
-    status = m.CharField(max_length=10, choices=SHOWTIME_STATUS)
+    status = m.CharField(default="available", max_length=10, choices=SHOWTIME_STATUS)
+
+    def save(self, *args, **kwargs):
+        if not self.end and self.start and self.movie:
+            # Calculate end time: start time + movie duration + 15 minutes
+            self.end = self.start + timedelta(minutes=self.movie.duration + 15)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.id}; {self.movie.title}; {self.auditorium}; start={self.start}:{self.start.minute}; end={self.end.hour}:{self.end.minute}"
-    
+
     def is_available(self, datetime, seats_amount):
         """Checks that the showtime status is available. A showtime will be available if:
         - Is not expired: the current datetime has not passed 15 minutes after the start of the movie.

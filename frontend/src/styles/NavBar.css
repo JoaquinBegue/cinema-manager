@@ -1,6 +1,8 @@
 .navbar {
   position: relative;
   z-index: 9999;
+  background-color: black !important;
+  color: white !important;
 }
 
 .navbar-left, .navbar-right {

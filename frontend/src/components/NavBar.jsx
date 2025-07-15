@@ -71,8 +71,6 @@ function NavBar({ page }) {
     <>
       <Navbar
         expand="lg"
-        className="bg-body-tertiary"
-        bg="dark"
         data-bs-theme="dark"
       >
         <Container fluid>
