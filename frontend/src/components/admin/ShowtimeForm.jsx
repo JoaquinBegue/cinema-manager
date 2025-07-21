@@ -9,22 +9,17 @@ import "./ShowtimeForm.css";
 
 function ShowtimeForm({ mode, selectedObjectId }) {
   // Helper function to format date in ISO 8601 format
-  const formatDate = (date, time) => {
-    const formatedDate = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        time.getHours(),
-        time.getMinutes()
-    );
-
-    return formatedDate.toISOString();
+  const formatDate = (datetime) => {
+    // Create a new date object with the local timezone
+    const localTime = new Date(datetime.getTime() - datetime.getTimezoneOffset() * 60000);
+    return localTime.toISOString();
   };
 
   // Form states.
   const [validData, setValidData] = useState(false);
   const [dateSelected, setDateSelected] = useState(false);
-  const [timeSelected, setTimeSelected] = useState(false);
+  const [datetimeSelected, setDatetimeSelected] = useState(false);
+  const [movieDuration, setMovieDuration] = useState(0);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -37,7 +32,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
   const [movie, setMovie] = useState("");
   const [auditorium, setAuditorium] = useState("");
   const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState(new Date());
+  const [datetime, setDatetime] = useState(new Date());
 
   // Fetch movies and populate form if updating.
   useEffect(() => {
@@ -58,10 +53,12 @@ function ShowtimeForm({ mode, selectedObjectId }) {
           );
           setMovie(response.data.movie);
           const startDateTime = new Date(response.data.start);
+          setMovieDuration(response.data.movie.duration);
           setAuditorium(response.data.auditorium);
           setDate(startDateTime);
-          setTime(startDateTime);
-          setTimeSelected(true);
+          setDatetime(startDateTime);
+          setDateSelected(true);
+          setDatetimeSelected(true);
         } catch (err) {
           setError(err.response?.data?.detail || "Failed to fetch showtime");
         }
@@ -72,10 +69,10 @@ function ShowtimeForm({ mode, selectedObjectId }) {
 
   // Validate data.
   useEffect(() => {
-    if (movie && dateSelected && timeSelected && auditorium) {
+    if (movie && dateSelected && datetimeSelected && auditorium) {
       setValidData(true);
     }
-  }, [movie, dateSelected, timeSelected, auditorium]);
+  }, [movie, dateSelected, datetimeSelected, auditorium]);
 
   // Update form data.
   const handleChange = (e) => {
@@ -89,30 +86,44 @@ function ShowtimeForm({ mode, selectedObjectId }) {
 
   // Fetch reserved times any time the auditorium or date changes.
   useEffect(() => {
+    if (!auditorium || !date) return;
     const fetchReservedTimes = async () => {
       const response = await api.get(`/admin/showtimes/reserved-times/`, {
-        params: { auditorium, date: formatDate(date, time) },
+        params: { auditorium, date: formatDate(datetime) },
       });
       setReservedTimes(response.data.reserved_times);
     };
     fetchReservedTimes();
   }, [auditorium, date]);
 
-  // Time filter function
+  // Time filter function. Returns true if time is valid to book, else false.
   const filterTimes = (time) => {
     const currentDate = new Date();
     const selectedDate = new Date(time);
-
+    
     // Check if the selected time is reserved.
     reservedTimes.forEach((reservedTime) => {
+      const reservedTimeStart = new Date(reservedTime.start);
+      const reservedTimeEnd = new Date(reservedTime.end);
+
+      // Check if reserved time collides with selected time (showtime start).
       if (
-        reservedTime.start <= selectedDate &&
-        reservedTime.end >= selectedDate
+        (reservedTimeStart <= selectedDate &&
+        reservedTimeEnd >= selectedDate) 
+      ) {
+        return false;
+      }
+
+      // Check if reserved time collides with
+      // selected time + movie duration + 15 minutes (showtime end).
+      if (
+        (reservedTimeStart <= new Date(selectedDate.getTime() + movieDuration * 60 * 1000 + 15 * 60 * 1000) &&
+        reservedTimeEnd >= new Date(selectedDate.getTime() + movieDuration * 60 * 1000 + 15 * 60 * 1000)) 
       ) {
         return false;
       }
     });
-
+    
     // Filter out times that are before the current date.
     return currentDate.getTime() <= selectedDate.getTime();
   };
@@ -127,7 +138,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     const formData = {
       movie: movie,
       auditorium: auditorium,
-      start: formatDate(date, time),
+      start: formatDate(datetime),
     };
 
     // Set headers.
@@ -154,7 +165,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
       setMovie(null);
       setAuditorium(null);
       setDate(new Date());
-      setTime(new Date());
+      setDatetime(new Date());
     } catch (err) {
       setError(err.response?.data?.detail || `Failed to ${mode} showtime`);
     }
@@ -173,6 +184,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
             value={movie}
             onChange={(e) => {
               setMovie(e.target.value);
+              setMovieDuration(movies.find((movie) => movie.id == e.target.value).duration)
               handleChange(e);
             }}
             required
@@ -213,6 +225,8 @@ function ShowtimeForm({ mode, selectedObjectId }) {
             selected={date}
             onChange={(date) => {
               setDate(date);
+              setDatetime(date);
+              setDatetimeSelected(false);
               setDateSelected(true);
             }}
             dateFormat="yyyy-MM-dd"
@@ -226,10 +240,11 @@ function ShowtimeForm({ mode, selectedObjectId }) {
             <DatePicker
               id="start-time"
               name="start-time"
-              selected={time}
-              onChange={(time) => {
-                setTime(time);
-                setTimeSelected(true);
+              selected={datetime}
+              onChange={(datetime) => {
+                setDatetime(datetime);
+                console.log(formatDate(datetime));
+                setDatetimeSelected(true);
               }}
               inline
               showTimeSelect
@@ -249,7 +264,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
         <Button
           type="submit"
           className="submit-button"
-          disabled={!validData || !dateSelected || !timeSelected}
+          disabled={!validData || !dateSelected || !datetimeSelected}
         >
           Submit
         </Button>

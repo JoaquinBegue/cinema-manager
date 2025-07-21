@@ -3,6 +3,8 @@ from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
 
 from api.models import Movie, Showtime, Reservation, User
 from api.serializers import MovieSerializer, ShowtimeSerializer, ReservationSerializer
@@ -32,8 +34,8 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
-class GetTimesView(APIView):
-    """Get times of future showtimes for a given auditorium and datetime."""
+class ReservedTimesView(APIView):
+    """Get reserved times of future showtimes for a given auditorium and datetime."""
     def get(self, request):
         """Get times."""
         # Get auditorium and datetime from request.
@@ -47,7 +49,7 @@ class GetTimesView(APIView):
             return Response({"error": "Invalid datetime format"}, status=400)
         
         # Get showtimes.
-        showtimes = Showtime.objects.filter(auditorium=auditorium, datetime__gte=date)
+        showtimes = Showtime.objects.filter(auditorium=auditorium, start__gte=date)
         reserved_times = []
         for showtime in showtimes:
             reserved_times.append({
