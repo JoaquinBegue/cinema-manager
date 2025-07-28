@@ -34,13 +34,14 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
-class ReservedTimesView(APIView):
-    """Get reserved times of future showtimes for a given auditorium and datetime."""
+class AvailableTimesView(APIView):
+    """Get available times of the day given auditorium, datetime and movie duration"""
     def get(self, request):
         """Get times."""
         # Get auditorium and datetime from request.
         auditorium = request.query_params.get("auditorium")
         date = request.query_params.get("date")
+        movie_duration = request.query_params.get("movie_duration")
 
         # Convert datetime to datetime object.
         try:

@@ -98,34 +98,26 @@ function ShowtimeForm({ mode, selectedObjectId }) {
 
   // Time filter function. Returns true if time is valid to book, else false.
   const filterTimes = (time) => {
-    const currentDate = new Date();
-    const selectedDate = new Date(time);
+    const showtimeStart = new Date(time);
     
     // Check if the selected time is reserved.
     reservedTimes.forEach((reservedTime) => {
       const reservedTimeStart = new Date(reservedTime.start);
       const reservedTimeEnd = new Date(reservedTime.end);
-
-      // Check if reserved time collides with selected time (showtime start).
+      const showtimeEnd = new Date(showtimeStart.getTime() + movieDuration * 60 * 1000 + 15 * 60 * 1000);
+      
+      // Check if reserved time collides with showtime start or end.
       if (
-        (reservedTimeStart <= selectedDate &&
-        reservedTimeEnd >= selectedDate) 
-      ) {
-        return false;
-      }
-
-      // Check if reserved time collides with
-      // selected time + movie duration + 15 minutes (showtime end).
-      if (
-        (reservedTimeStart <= new Date(selectedDate.getTime() + movieDuration * 60 * 1000 + 15 * 60 * 1000) &&
-        reservedTimeEnd >= new Date(selectedDate.getTime() + movieDuration * 60 * 1000 + 15 * 60 * 1000)) 
+        (reservedTimeStart <= showtimeStart) && (reservedTimeEnd >= showtimeStart) ||
+        (reservedTimeStart <= showtimeEnd) && (reservedTimeEnd >= showtimeEnd)
       ) {
         return false;
       }
     });
     
     // Filter out times that are before the current date.
-    return currentDate.getTime() <= selectedDate.getTime();
+    const currentDate = new Date();
+    return currentDate.getTime() <= showtimeStart.getTime();
   };
 
   // Submit form.
