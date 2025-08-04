@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import api from "../../api";
 
 // Components
-import { Container, Nav, Button } from "react-bootstrap";
+import { Container, Nav, Button, Row, Col } from "react-bootstrap";
 import ObjectList from "./ObjectList";
 import ShowtimeForm from "./ShowtimeForm";
 
@@ -11,6 +11,25 @@ import ShowtimeForm from "./ShowtimeForm";
 import "../../styles/Admin.css";
 
 function FormContainer() {
+  const objectFields = {
+    showtime: {
+      id: "ID",
+      movie_title: "Movie",
+      auditorium: "Auditorium",
+      start_datetime: "Start Time",
+      status: "Status",
+    },
+    movie: { id: "ID", title: "Title" },
+    reservation: {
+      id: "ID",
+      code: "Code",
+      movie_title: "Movie",
+      showtime_start: "Date",
+      status: "Status",
+      seats: "Seats",
+    },
+    user: { id: "ID", email: "Email", is_staff: "Is Staff" },
+  };
   const tabs = [
     { key: "showtime", label: "Showtimes" },
     { key: "movie", label: "Movies" },
@@ -51,17 +70,36 @@ function FormContainer() {
           </Nav.Item>
         ))}
       </Nav>
-      {/* Add or close buttons */}
-      <Container>
-        {showForm ? (
-          <Button onClick={() => setShowForm(false)}>Close</Button>
-        ) : (
-          <Button onClick={() => handleClick(null, "create")}>Add</Button>
-        )}
+      <Container className="object-fields-container">
+       <Row>
+          {!showForm && ( 
+          <Col xs={12} md={10}>
+            <Row>
+              {Object.values(objectFields[activeTab.key]).map(
+                (value) => (
+                  <Col key={value}>
+                    <p>
+                      <strong>{value}</strong>
+                    </p>
+                  </Col>
+                )
+              )}
+            </Row>
+          </Col>
+          )}
+          <Col xs={12} md={2}>
+            {/* Add or close buttons */}
+            {showForm ? (
+              <Button className="close-button btn" onClick={() => setShowForm(false)}>Close</Button>
+            ) : (
+              <Button className="add-button btn btn-success" onClick={() => handleClick(null, "create")}>Add</Button>
+            )}
+          </Col>
+        </Row>
       </Container>
       {/* Object List or Form */}
       {!showForm ? (
-        <ObjectList activeTab={activeTab} handleClick={handleClick} />
+        <ObjectList activeTab={activeTab} handleClick={handleClick} objectFields={objectFields[activeTab.key]} />
       ) : activeTab.key === "showtime" ? (
         <ShowtimeForm mode={mode} selectedObjectId={selectedObjectId} />
       ) : (

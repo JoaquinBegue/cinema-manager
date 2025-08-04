@@ -1,16 +1,17 @@
 .admin-navbar {
     background-color: #ffffff !important;
     color: #000000 !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .admin-navbar .navbar-brand {
     color: #000000 !important;
 }
 
-.forms-container, .operations-container {
+.forms-container,
+.operations-container {
     background-color: #ffffff !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     height: fit-content;
     padding: 0px !important;
 }
@@ -21,7 +22,8 @@
 
 /* Style inactive tabs */
 .nav-tabs .nav-link:not(.active) {
-    background-color: #f0f0f0; /* Light grey background */
+    background-color: #f0f0f0;
+    /* Light grey background */
     border-color: #dee2e6;
     color: #000000 !important;
 }
@@ -51,11 +53,20 @@
 .list-group-item:hover {
     background-color: #f0f0f0;
 }
-        
-.col > p {
+
+.col>p {
     margin: 5px;
 }
 
 .showtime-form {
     width: 50% !important;
+}
+
+.object-fields-container {
+    padding: 1rem !important;
+}
+
+.add-button,
+.close-button {
+    width: 150px;
 }

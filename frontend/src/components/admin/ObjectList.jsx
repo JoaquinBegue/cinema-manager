@@ -7,28 +7,8 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
 // Components
 import { Container, ListGroup, Row, Col, Button, Alert } from "react-bootstrap";
 
-function ObjectList({ activeTab, handleClick }) {
+function ObjectList({ activeTab, handleClick, objectFields }) {
   const [objects, setObjects] = useState([]);
-  const objectFields = {
-    showtime: {
-      id: "ID",
-      movie_title: "Movie",
-      auditorium: "Auditorium",
-      start_time: "Start Time",
-      status: "Status",
-    },
-    movie: { id: "ID", title: "Title" },
-    reservation: {
-      id: "ID",
-      code: "Code",
-      movie_title: "Movie",
-      showtime_start: "Date",
-      status: "Status",
-      seats: "Seats",
-    },
-    user: { id: "ID", email: "Email", is_staff: "Is Staff" },
-  };
-
   const [currentDeleteId, setCurrentDeleteId] = useState(null);
   const [deletedId, setDeletedId] = useState(null);
   const [password, setPassword] = useState("");
@@ -87,11 +67,11 @@ function ObjectList({ activeTab, handleClick }) {
             <Row>
               <Col xs={12} md={10}>
                 <Row>
-                  {Object.entries(objectFields[activeTab.key]).map(
+                  {Object.entries(objectFields).map(
                     ([key, value]) => (
                       <Col key={key}>
                         <p>
-                          <strong>{value}</strong>: {object[key]}
+                          {object[key]}
                         </p>
                       </Col>
                     )

@@ -104,3 +104,8 @@
   font-size: 0.9rem;
   margin-top: 1rem;
 }
+
+.time-option:hover {
+  background-color: #0059b8;
+  color: white;
+}

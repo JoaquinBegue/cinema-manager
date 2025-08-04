@@ -9,7 +9,7 @@ router.register(r'reservations', views.ReservationViewSet)
 router.register(r'users', views.UserViewSet)
 
 urlpatterns = [
-    path('showtimes/reserved-times/', views.ReservedTimesView.as_view(), name='reserved-times'),
+    path('showtimes/available-times/', views.AvailableTimesView.as_view(), name='available-times'),
     path('', include(router.urls)),
 ]
 

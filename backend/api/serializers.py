@@ -53,6 +53,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 class ShowtimeSerializer(serializers.ModelSerializer):
     movie_title = serializers.SerializerMethodField()
     start_time = serializers.SerializerMethodField()
+    start_datetime = serializers.SerializerMethodField()
 
     class Meta:
         model = Showtime
@@ -63,3 +64,6 @@ class ShowtimeSerializer(serializers.ModelSerializer):
 
     def get_start_time(self, obj):
         return obj.start.strftime("%H:%M") if obj.start else None
+
+    def get_start_datetime(self, obj):
+        return obj.start.strftime("%d/%m %H:%M") if obj.start else None

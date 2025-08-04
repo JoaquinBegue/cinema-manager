@@ -1,4 +1,6 @@
 TODO: Main
+- move object data validation to object serializer's validate method.
+
 - let the admin user input json data to create multiple objects
 
 - install https://reactdatepicker.com/

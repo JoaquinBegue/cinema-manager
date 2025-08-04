@@ -5,20 +5,13 @@ import api from "../../api";
 import { Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import LoadingIndicator from "../LoadingIndicator";
 import "./ShowtimeForm.css";
 
 function ShowtimeForm({ mode, selectedObjectId }) {
-  // Helper function to format date in ISO 8601 format
-  const formatDate = (datetime) => {
-    // Create a new date object with the local timezone
-    const localTime = new Date(datetime.getTime() - datetime.getTimezoneOffset() * 60000);
-    return localTime.toISOString();
-  };
-
   // Form states.
   const [validData, setValidData] = useState(false);
-  const [dateSelected, setDateSelected] = useState(false);
-  const [datetimeSelected, setDatetimeSelected] = useState(false);
+  const [fetchingTimes, setFetchingTimes] = useState(false);
   const [movieDuration, setMovieDuration] = useState(0);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -26,13 +19,13 @@ function ShowtimeForm({ mode, selectedObjectId }) {
   // Display states.
   const [movies, setMovies] = useState([]);
   const auditoriums = [1, 2, 3, 4, 5];
-  const [reservedTimes, setReservedTimes] = useState([]);
+  const [availableTimes, setAvailableTimes] = useState([]);
 
   // Form data.
-  const [movie, setMovie] = useState("");
-  const [auditorium, setAuditorium] = useState("");
-  const [date, setDate] = useState(new Date());
-  const [datetime, setDatetime] = useState(new Date());
+  const [movie, setMovie] = useState(null);
+  const [auditorium, setAuditorium] = useState(null);
+  const [date, setDate] = useState(null);
+  const [time, setTime] = useState(null);
 
   // Fetch movies and populate form if updating.
   useEffect(() => {
@@ -56,9 +49,9 @@ function ShowtimeForm({ mode, selectedObjectId }) {
           setMovieDuration(response.data.movie.duration);
           setAuditorium(response.data.auditorium);
           setDate(startDateTime);
-          setDatetime(startDateTime);
+          setTime(startDateTime);
           setDateSelected(true);
-          setDatetimeSelected(true);
+          setTimeSelected(true);
         } catch (err) {
           setError(err.response?.data?.detail || "Failed to fetch showtime");
         }
@@ -67,58 +60,38 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     }
   }, []);
 
-  // Validate data.
-  useEffect(() => {
-    if (movie && dateSelected && datetimeSelected && auditorium) {
-      setValidData(true);
-    }
-  }, [movie, dateSelected, datetimeSelected, auditorium]);
-
-  // Update form data.
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "movie") {
-      setMovie(value);
-    } else if (name === "auditorium") {
-      setAuditorium(value);
-    }
-  };
-
-  // Fetch reserved times any time the auditorium or date changes.
+  // Fetch available times any time the auditorium or date changes.
   useEffect(() => {
     if (!auditorium || !date) return;
-    const fetchReservedTimes = async () => {
-      const response = await api.get(`/admin/showtimes/reserved-times/`, {
-        params: { auditorium, date: formatDate(datetime) },
+    const fetchAvailableTimes = async () => {
+      setFetchingTimes(true);
+      const response = await api.get(`/admin/showtimes/available-times/`, {
+        params: { auditorium, date: date.toISOString(), movie_duration: movieDuration },
       });
-      setReservedTimes(response.data.reserved_times);
+      setAvailableTimes(response.data.available_times);
+      setTimeout(() => {
+        setFetchingTimes(false);
+      }, 1000);
     };
-    fetchReservedTimes();
+    fetchAvailableTimes();
   }, [auditorium, date]);
 
-  // Time filter function. Returns true if time is valid to book, else false.
-  const filterTimes = (time) => {
-    const showtimeStart = new Date(time);
-    
-    // Check if the selected time is reserved.
-    reservedTimes.forEach((reservedTime) => {
-      const reservedTimeStart = new Date(reservedTime.start);
-      const reservedTimeEnd = new Date(reservedTime.end);
-      const showtimeEnd = new Date(showtimeStart.getTime() + movieDuration * 60 * 1000 + 15 * 60 * 1000);
-      
-      // Check if reserved time collides with showtime start or end.
-      if (
-        (reservedTimeStart <= showtimeStart) && (reservedTimeEnd >= showtimeStart) ||
-        (reservedTimeStart <= showtimeEnd) && (reservedTimeEnd >= showtimeEnd)
-      ) {
-        return false;
-      }
-    });
-    
-    // Filter out times that are before the current date.
+  // Time filter function for date picker.
+  const filterDate = (date) => {
+    // Filter dates that are past today and less than 3 days from today.
     const currentDate = new Date();
-    return currentDate.getTime() <= showtimeStart.getTime();
+    const selectedDate = new Date(date);
+    const daysLeftInMiliseconds = Math.floor((currentDate.getTime() - selectedDate.getTime())) + 3 * 24 * 60 * 60 * 1000; 
+    return currentDate.getTime() + daysLeftInMiliseconds < selectedDate.getTime();
   };
+
+  // Validate data.
+  useEffect(() => {
+    if (movie && date && time && auditorium) {
+      setValidData(true);
+    }
+  }, [movie, date, time, auditorium]);
+  
 
   // Submit form.
   const handleSubmit = async (e) => {
@@ -130,7 +103,8 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     const formData = {
       movie: movie,
       auditorium: auditorium,
-      start: formatDate(datetime),
+      date: date.toISOString(),
+      time: time,
     };
 
     // Set headers.
@@ -163,22 +137,37 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     }
   };
 
+  // Update form data.
+  const handleChange = (e, extra=null) => {
+    const { name, value } = e.target;
+    switch (name) {
+      case "movie":
+        setMovie(value);
+        setMovieDuration(movies.find((extra) => extra.id == value).duration)
+        break;
+      case "auditorium":
+        setAuditorium(value);
+        setTime(null);
+        break;
+      case "time":
+        setTime(value);
+        break;
+    }
+  };
+
   return (
     <div className="showtime-form-container mx-auto p-2">
       {mode === "create" && <h2>Create Showtime</h2>}
       {mode === "update" && <h2>Update Showtime</h2>}
       <Form onSubmit={handleSubmit} className="showtime-form">
+        {/* Movie selector */}
         <div className="form-group">
           <label htmlFor="movie">Movie</label>
           <select
             id="movie"
             name="movie"
             value={movie}
-            onChange={(e) => {
-              setMovie(e.target.value);
-              setMovieDuration(movies.find((movie) => movie.id == e.target.value).duration)
-              handleChange(e);
-            }}
+            onChange={(e) => handleChange(e, movie)}
             required
           >
             <option value="">Select a movie</option>
@@ -190,6 +179,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
           </select>
         </div>
 
+        {/* Auditorium selector */}
         <div className="form-group">
           <label htmlFor="auditorium">Auditorium</label>
           <select
@@ -208,6 +198,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
           </select>
         </div>
 
+        {/* Date picker */}
         <div className="date-picker-container">
           <label htmlFor="start-date">Start Date</label>
           <DatePicker
@@ -217,38 +208,35 @@ function ShowtimeForm({ mode, selectedObjectId }) {
             selected={date}
             onChange={(date) => {
               setDate(date);
-              setDatetime(date);
-              setDatetimeSelected(false);
-              setDateSelected(true);
+              setTime(null);
             }}
             dateFormat="yyyy-MM-dd"
             className="date-picker"
+            filterDate={filterDate}
           />
         </div>
 
-        {(dateSelected || mode === "update") && (
-          <div className="date-picker-container">
-            <label htmlFor="start-time">Start Time</label>
-            <DatePicker
-              id="start-time"
-              name="start-time"
-              selected={datetime}
-              onChange={(datetime) => {
-                setDatetime(datetime);
-                console.log(formatDate(datetime));
-                setDatetimeSelected(true);
-              }}
-              inline
-              showTimeSelect
-              showTimeSelectOnly
-              filterTime={filterTimes}
-              timeIntervals={15}
-              dateFormat="h:mm aa"
-              showTimeCaption={false}
-              className="date-picker"
-            />
-          </div>
+        {/* Time selector */}
+        {date && auditorium && !fetchingTimes && (
+        <div className="form-group">
+          <label htmlFor="time">Time</label>
+          <select
+            id="time"
+            name="time"
+            value={time}
+            onChange={handleChange}
+            size={10}
+            required
+          >
+            {availableTimes.map((time) => (
+              <option className="time-option" key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+        </div>
         )}
+        {fetchingTimes && <LoadingIndicator />}
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
@@ -256,7 +244,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
         <Button
           type="submit"
           className="submit-button"
-          disabled={!validData || !dateSelected || !datetimeSelected}
+          disabled={!validData}
         >
           Submit
         </Button>
