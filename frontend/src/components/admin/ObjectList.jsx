@@ -67,15 +67,21 @@ function ObjectList({ activeTab, handleClick, objectFields }) {
             <Row>
               <Col xs={12} md={10}>
                 <Row>
-                  {Object.entries(objectFields).map(
-                    ([key, value]) => (
-                      <Col key={key}>
-                        <p>
-                          {object[key]}
-                        </p>
-                      </Col>
-                    )
-                  )}
+                  {Object.entries(objectFields).map(([key, value]) => (
+                    <Col key={key}>
+                      <p>
+                        {value === "Start" ? (
+                          <>
+                            {object[key].year}-{object[key].month}-
+                            {object[key].day} {object[key].hour}:
+                            {object[key].minute}
+                          </>
+                        ) : (
+                          object[key]
+                        )}
+                      </p>
+                    </Col>
+                  ))}
                 </Row>
               </Col>
               <Col xs={12} md={2}>

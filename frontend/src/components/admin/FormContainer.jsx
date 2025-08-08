@@ -16,7 +16,8 @@ function FormContainer() {
       id: "ID",
       movie_title: "Movie",
       auditorium: "Auditorium",
-      start_datetime: "Start Time",
+      start_date: "Date",
+      start_time: "Time",
       status: "Status",
     },
     movie: { id: "ID", title: "Title" },
@@ -71,35 +72,47 @@ function FormContainer() {
         ))}
       </Nav>
       <Container className="object-fields-container">
-       <Row>
-          {!showForm && ( 
-          <Col xs={12} md={10}>
-            <Row>
-              {Object.values(objectFields[activeTab.key]).map(
-                (value) => (
+        <Row>
+          {!showForm && (
+            <Col xs={12} md={10}>
+              <Row>
+                {Object.values(objectFields[activeTab.key]).map((value) => (
                   <Col key={value}>
                     <p>
                       <strong>{value}</strong>
                     </p>
                   </Col>
-                )
-              )}
-            </Row>
-          </Col>
+                ))}
+              </Row>
+            </Col>
           )}
           <Col xs={12} md={2}>
             {/* Add or close buttons */}
             {showForm ? (
-              <Button className="close-button btn" onClick={() => setShowForm(false)}>Close</Button>
+              <Button
+                className="close-button btn"
+                onClick={() => setShowForm(false)}
+              >
+                Close
+              </Button>
             ) : (
-              <Button className="add-button btn btn-success" onClick={() => handleClick(null, "create")}>Add</Button>
+              <Button
+                className="add-button btn btn-success"
+                onClick={() => handleClick(null, "create")}
+              >
+                Add
+              </Button>
             )}
           </Col>
         </Row>
       </Container>
       {/* Object List or Form */}
       {!showForm ? (
-        <ObjectList activeTab={activeTab} handleClick={handleClick} objectFields={objectFields[activeTab.key]} />
+        <ObjectList
+          activeTab={activeTab}
+          handleClick={handleClick}
+          objectFields={objectFields[activeTab.key]}
+        />
       ) : activeTab.key === "showtime" ? (
         <ShowtimeForm mode={mode} selectedObjectId={selectedObjectId} />
       ) : (

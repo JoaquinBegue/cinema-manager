@@ -66,7 +66,11 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     const fetchAvailableTimes = async () => {
       setFetchingTimes(true);
       const response = await api.get(`/admin/showtimes/available-times/`, {
-        params: { auditorium, date: date.toISOString(), movie_duration: movieDuration },
+        params: {
+          auditorium,
+          date: date.toISOString(),
+          movie_duration: movieDuration,
+        },
       });
       setAvailableTimes(response.data.available_times);
       setTimeout(() => {
@@ -81,8 +85,12 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     // Filter dates that are past today and less than 3 days from today.
     const currentDate = new Date();
     const selectedDate = new Date(date);
-    const daysLeftInMiliseconds = Math.floor((currentDate.getTime() - selectedDate.getTime())) + 3 * 24 * 60 * 60 * 1000; 
-    return currentDate.getTime() + daysLeftInMiliseconds < selectedDate.getTime();
+    const daysLeftInMiliseconds =
+      Math.floor(currentDate.getTime() - selectedDate.getTime()) +
+      3 * 24 * 60 * 60 * 1000;
+    return (
+      currentDate.getTime() + daysLeftInMiliseconds < selectedDate.getTime()
+    );
   };
 
   // Validate data.
@@ -91,7 +99,6 @@ function ShowtimeForm({ mode, selectedObjectId }) {
       setValidData(true);
     }
   }, [movie, date, time, auditorium]);
-  
 
   // Submit form.
   const handleSubmit = async (e) => {
@@ -138,12 +145,12 @@ function ShowtimeForm({ mode, selectedObjectId }) {
   };
 
   // Update form data.
-  const handleChange = (e, extra=null) => {
+  const handleChange = (e, extra = null) => {
     const { name, value } = e.target;
     switch (name) {
       case "movie":
         setMovie(value);
-        setMovieDuration(movies.find((extra) => extra.id == value).duration)
+        setMovieDuration(movies.find((extra) => extra.id == value).duration);
         break;
       case "auditorium":
         setAuditorium(value);
@@ -218,34 +225,30 @@ function ShowtimeForm({ mode, selectedObjectId }) {
 
         {/* Time selector */}
         {date && auditorium && !fetchingTimes && (
-        <div className="form-group">
-          <label htmlFor="time">Time</label>
-          <select
-            id="time"
-            name="time"
-            value={time}
-            onChange={handleChange}
-            size={10}
-            required
-          >
-            {availableTimes.map((time) => (
-              <option className="time-option" key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="form-group">
+            <label htmlFor="time">Time</label>
+            <select
+              id="time"
+              name="time"
+              value={time}
+              onChange={handleChange}
+              size={10}
+              required
+            >
+              {availableTimes.map((time) => (
+                <option className="time-option" key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
         {fetchingTimes && <LoadingIndicator />}
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 
-        <Button
-          type="submit"
-          className="submit-button"
-          disabled={!validData}
-        >
+        <Button type="submit" className="submit-button" disabled={!validData}>
           Submit
         </Button>
       </Form>
