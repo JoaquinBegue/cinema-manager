@@ -46,7 +46,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
           );
           setMovie(response.data.movie);
           const startDateTime = new Date(response.data.start);
-          setMovieDuration(response.data.movie.duration);
+          setMovieDuration(response.data.movie_duration);
           setAuditorium(response.data.auditorium);
           setDate(startDateTime);
           setTime(startDateTime);

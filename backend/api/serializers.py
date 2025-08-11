@@ -1,6 +1,9 @@
 from rest_framework import serializers
-from datetime import timedelta
+from rest_framework.exceptions import NotFound
+from datetime import datetime, timedelta
+from django.utils import timezone
 
+from .utils import validate_showtime
 from .models import Movie, Seat, Reservation, Showtime
 
 
@@ -52,8 +55,9 @@ class ReservationSerializer(serializers.ModelSerializer):
 
 class ShowtimeSerializer(serializers.ModelSerializer):
     movie_title = serializers.SerializerMethodField()
+    start_date = serializers.SerializerMethodField()
     start_time = serializers.SerializerMethodField()
-    start_datetime = serializers.SerializerMethodField()
+    movie_duration = serializers.SerializerMethodField()
 
     class Meta:
         model = Showtime
@@ -62,8 +66,43 @@ class ShowtimeSerializer(serializers.ModelSerializer):
     def get_movie_title(self, obj):
         return obj.movie.title
 
-    def get_start_time(self, obj):
-        return obj.start.strftime("%H:%M") if obj.start else None
+    def get_start_date(self, obj):
+        return timezone.localtime(obj.start).strftime("%Y-%m-%d")
 
-    def get_start_datetime(self, obj):
-        return obj.start.strftime("%d/%m %H:%M") if obj.start else None
+    def get_start_time(self, obj):
+        return timezone.localtime(obj.start).strftime("%H:%M")
+
+    def get_movie_duration(self, obj):
+        return obj.movie.duration
+    
+    def validate(self, data):
+        """Validate showtime data."""
+        # Get data from request
+        movie = data['movie']
+        auditorium = data['auditorium']
+        start = data['start']
+        end = start + (timedelta(minutes=movie.duration + 15))
+        
+        if not all([movie, auditorium, start]):
+            raise serializers.ValidationError("Movie, auditorium, and start time are required.")
+        
+        # Validate auditorium
+        if auditorium < 1 or auditorium > 5:
+            raise serializers.ValidationError("Invalid auditorium. Must be between 1 and 5.")
+
+        # Validate start.
+        if not validate_showtime(start, end, auditorium):
+            raise serializers.ValidationError("Selected time is not available.")
+        
+        return data
+    
+    def create(self, validated_data):
+        return Showtime.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.movie = validated_data.get('movie', instance.movie)
+        instance.auditorium = validated_data.get('auditorium', instance.auditorium)
+        instance.start = validated_data.get('start', instance.start)
+        instance.save()
+        return instance
+        

@@ -128,3 +128,23 @@ def init_db():
     create_showtimes(m[0])
 
     create_seats()
+
+from django.db.models import Q
+
+def validate_showtime(start, end, auditorium):
+    """Checks if a showtime with the given parameters
+    overlaps with any existing showtime."""
+    overlapping_showtimes = Showtime.objects.filter(
+        Q(auditorium=auditorium) & (
+            # Start overlaps showtime.
+            Q(start__lte=start, end__gte=start) | 
+            # End overlaps showtime.
+            Q(start__lte=end, end__gte=end) |
+            # Complete overlap.
+            Q(start__gte=start, end__lte=end)
+        )
+    )
+    
+    if overlapping_showtimes.exists():
+        return False
+    return True
