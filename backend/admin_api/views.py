@@ -53,12 +53,13 @@ class ShowtimeViewSet(ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid()
         serializer.save()
-
         return Response({"message": "Showtime created successfully"}, status=201)
+
 
     def update(self, request, pk=None):
         """Update showtime."""
         # Get data from request
+        showtime = self.get_object()
         movie_id = request.data.get("movie")
         auditorium = request.data.get("auditorium")
         date = request.data.get("date")
@@ -78,7 +79,7 @@ class ShowtimeViewSet(ModelViewSet):
         data = {'movie': movie_id, 'auditorium': auditorium, 'start': start}
 
         # Use serializer for validation and creation
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(showtime, data=data)
         serializer.is_valid()
         serializer.save()
 

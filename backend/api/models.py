@@ -100,7 +100,7 @@ class Showtime(m.Model):
     status = m.CharField(default="available", max_length=10, choices=SHOWTIME_STATUS)
 
     def save(self, *args, **kwargs):
-        if not self.end and self.start and self.movie:
+        if self.start and self.movie:
             # Calculate end time: start time + movie duration + 15 minutes
             self.end = self.start + timedelta(minutes=self.movie.duration + 15)
         super().save(*args, **kwargs)

@@ -144,6 +144,8 @@ def validate_showtime(start, end, auditorium):
             Q(start__gte=start, end__lte=end)
         )
     )
+
+    print(overlapping_showtimes)
     
     if overlapping_showtimes.exists():
         return False
