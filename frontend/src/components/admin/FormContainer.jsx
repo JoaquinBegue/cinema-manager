@@ -6,6 +6,7 @@ import api from "../../api";
 import { Container, Nav, Button, Row, Col } from "react-bootstrap";
 import ObjectList from "./ObjectList";
 import ShowtimeForm from "./ShowtimeForm";
+import MovieForm from "./MovieForm";
 
 // Styles
 import "../../styles/Admin.css";
@@ -114,7 +115,17 @@ function FormContainer() {
           objectFields={objectFields[activeTab.key]}
         />
       ) : activeTab.key === "showtime" ? (
-        <ShowtimeForm mode={mode} selectedObjectId={selectedObjectId} />
+        <ShowtimeForm 
+          mode={mode} 
+          selectedObjectId={selectedObjectId} 
+          onClose={handleCloseForm}
+        />
+      ) : activeTab.key === "movie" ? (
+        <MovieForm 
+          mode={mode} 
+          selectedObjectId={selectedObjectId} 
+          onClose={handleCloseForm}
+        />
       ) : (
         <p>Not found</p>
       )}

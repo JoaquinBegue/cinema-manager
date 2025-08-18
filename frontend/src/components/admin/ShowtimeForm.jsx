@@ -8,18 +8,20 @@ import "react-datepicker/dist/react-datepicker.css";
 import LoadingIndicator from "../LoadingIndicator";
 import "./ShowtimeForm.css";
 
-function ShowtimeForm({ mode, selectedObjectId }) {
+function ShowtimeForm({ mode, selectedObjectId, onClose }) {
   // Form states.
   const [validData, setValidData] = useState(false);
   const [fetchingTimes, setFetchingTimes] = useState(false);
-  const [movieDuration, setMovieDuration] = useState(0);
+  const [noTimesAvailable, setNoTimesAvailable] = useState(false);
+  const [createAnother, setCreateAnother] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+  
   // Display states.
   const [movies, setMovies] = useState([]);
   const auditoriums = [1, 2, 3, 4, 5];
   const [availableTimes, setAvailableTimes] = useState([]);
+  const [movieDuration, setMovieDuration] = useState(0);
 
   // Form data.
   const [movie, setMovie] = useState(null);
@@ -45,13 +47,10 @@ function ShowtimeForm({ mode, selectedObjectId }) {
             `/admin/showtimes/${selectedObjectId}/`
           );
           setMovie(response.data.movie);
-          const startDateTime = new Date(response.data.start);
           setMovieDuration(response.data.movie_duration);
           setAuditorium(response.data.auditorium);
-          setDate(startDateTime);
-          setTime(startDateTime);
-          setDateSelected(true);
-          setTimeSelected(true);
+          const startDate = new Date(response.data.start);
+          setDate(startDate);
         } catch (err) {
           setError(err.response?.data?.detail || "Failed to fetch showtime");
         }
@@ -72,6 +71,11 @@ function ShowtimeForm({ mode, selectedObjectId }) {
           movie_duration: movieDuration,
         },
       });
+      if (response.data.available_times.length === 0) {
+        setNoTimesAvailable(true);
+      } else {
+        setNoTimesAvailable(false);
+      }
       setAvailableTimes(response.data.available_times);
       setTimeout(() => {
         setFetchingTimes(false);
@@ -100,6 +104,27 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     }
   }, [movie, date, time, auditorium]);
 
+  // Reset form function
+  const resetForm = () => {
+    // Reset form state
+    setMovie(null);
+    setAuditorium(null);
+    setDate(null);
+    setTime(null);
+    setValidData(false);
+    setFetchingTimes(false);
+    setNoTimesAvailable(false);
+    setCreateAnother(false);
+    setError("");
+    setSuccess("");
+    
+    // Reset form inputs
+    const form = document.querySelector('.showtime-form');
+    if (form) {
+      form.reset();
+    }
+  };
+
   // Submit form.
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,23 +148,24 @@ function ShowtimeForm({ mode, selectedObjectId }) {
     // Make request.
     try {
       if (mode === "create") {
-        await api.post("/admin/showtimes/", formData, {
-          headers,
-        });
+        await api.post("/admin/showtimes/", formData, { headers });
       } else {
-        await api.put(`/admin/showtimes/${selectedObjectId}/`, formData, {
-          headers,
-        });
+        await api.put(`/admin/showtimes/${selectedObjectId}/`, formData, { headers });
       }
-      setSuccess(
-        `Showtime ${mode === "create" ? "created" : "updated"} successfully!`
-      );
-      // Reset form
-      setMovie(null);
-      setAuditorium(null);
-      setDate(new Date());
-      setDatetime(new Date());
+      
+      setSuccess(`Showtime ${mode === "create" ? "created" : "updated"} successfully!`);
+      
+      if (!createAnother) {
+        // Close the form after a delay
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      } else {
+        // Reset form for next entry
+        resetForm();
+      }
     } catch (err) {
+      console.log(err);
       setError(err.response?.data?.detail || `Failed to ${mode} showtime`);
     }
   };
@@ -165,7 +191,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
   return (
     <div className="showtime-form-container mx-auto p-2">
       {mode === "create" && <h2>Create Showtime</h2>}
-      {mode === "update" && <h2>Update Showtime</h2>}
+      {mode === "update" && <h2>Update Showtime #{selectedObjectId}</h2>}
       <Form onSubmit={handleSubmit} className="showtime-form">
         {/* Movie selector */}
         <div className="form-group">
@@ -224,7 +250,7 @@ function ShowtimeForm({ mode, selectedObjectId }) {
         </div>
 
         {/* Time selector */}
-        {date && auditorium && !fetchingTimes && (
+        {date && auditorium && !fetchingTimes && !noTimesAvailable && (
           <div className="form-group">
             <label htmlFor="time">Time</label>
             <select
@@ -244,13 +270,19 @@ function ShowtimeForm({ mode, selectedObjectId }) {
           </div>
         )}
         {fetchingTimes && <LoadingIndicator />}
+        {noTimesAvailable && <div className="error-message">No times available</div>}
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 
-        <Button type="submit" className="submit-button" disabled={!validData}>
+        <Button type="submit" className="btn btn-success submit-button" disabled={!validData}>
           Submit
         </Button>
+        {mode == "create" && (
+          <Button type="submit" className="btn btn-primary submit-button" disabled={!validData} onClick={() => setCreateAnother(true)}>
+            Submit and create another
+          </Button>
+        )}
       </Form>
     </div>
   );

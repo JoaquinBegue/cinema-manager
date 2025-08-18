@@ -1,27 +1,6 @@
-GENERAL:
-    - if updating, get object data.
-    - display corresponding fields with object data.
-    - if updating, display object id.
-
-
-SHOWTIME FORM:
-    Datetime availability checking:
-        the user will select a movie, an auditorium and a date and then will 
-        request the available times for the showtime to start.
-        this approach will reduce the logic in frontend and help to code the
-        validation in backend.
-    
-        Frontend:
-            An array of intervals of available times will be fetched from the backend.
-            This array will be updated any time the user selects a movie, an auditorium
-            or a date.
-            A loading indicator should be displayed while the array is being fetched.
-            The filter function should check if the selected time is in any of the
-            intervals of the array.
-            
-        Backend:
-            A view will return the available times for the showtime to start
-            based on the selected movie duration, auditorium and date.
+NOTIFICATIONS:
+    - send success message to operations tab
+    - keep error message in form
 
 MOVIE FORM:
     Fields: 

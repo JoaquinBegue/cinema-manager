@@ -22,6 +22,29 @@ class MovieViewSet(ModelViewSet):
     serializer_class = MovieSerializer
     permission_classes = [AllowAny]
 
+    def create(self, request):
+        """Create movie."""
+        # Get data from request
+        title = request.data.get("title")
+        synopsis = request.data.get("synopsis")
+        poster = request.data.get("poster")
+        genre = request.data.get("genre")
+        duration = request.data.get("duration")
+        director = request.data.get("director")
+        cast = request.data.get("cast")
+        trailer_url = request.data.get("trailer_url")
+
+        # Prepare data for serializer
+        data = {'title': title, 'synopsis': synopsis, 'poster': poster, 'genre': genre,
+                'duration': duration, 'director': director, 'cast': cast,
+                'trailer_url': trailer_url}
+
+        # Use serializer for validation and creation
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid()
+        serializer.save()
+        return Response({"message": "Movie created successfully"}, status=201)
+
 class ShowtimeViewSet(ModelViewSet):
     """Manage showtimes."""
     queryset = Showtime.objects.all()

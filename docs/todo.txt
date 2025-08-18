@@ -1,9 +1,5 @@
 TODO: Main
-- move object data validation to object serializer's validate method.
-
 - let the admin user input json data to create multiple objects
-
-- install https://reactdatepicker.com/
 
 - Change showtime form's select movie field for a search bar.
     - Move search bar from navbar to a separate component and use it in showtime form.

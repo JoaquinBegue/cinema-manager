@@ -3,9 +3,18 @@ from django.db import models as m
 from django.contrib.auth.models import User
 
 MOVIE_GENRES = {
+        "action": "Action",
+        "adventure": "Adventure",
+        "animation": "Animation",
+        "comedy": "Comedy",
         "crime": "Crime",
+        "documentary": "Documentary", 
         "drama": "Drama",
+        "fantasy": "Fantasy",
+        "horror": "Horror",
+        "romance": "Romance", 
         "science fiction": "Science Fiction",
+        "thriller": "Thriller", 
     }
 
 SHOWTIME_STATUS = {
