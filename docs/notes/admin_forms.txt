@@ -15,7 +15,16 @@ MOVIE FORM:
 
 
 RESERVATION FORM:
-    Fields:
-        - user_id is a integer field.
-        - showtime is a select field.
-        - seats is a select multiple field.
+    to select the user, a text field will let the admin search for a user by
+    his name and surname.
+
+    the admin should select a user, a showtime and seats.
+    to select the showtime, the admin should select a movie and a date.
+    then, a list of available showtimes should appear.
+    when the admin selects the showtime, a list of available seats should appear.
+
+    to select the seats, try to reuse the seat selector component.
+    
+    if updating, only the basic fields should appear and a "change" button
+    at the side of each field should display the necessary fields to update
+    that field.

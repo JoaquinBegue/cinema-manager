@@ -25,8 +25,7 @@ function FormContainer() {
     reservation: {
       id: "ID",
       code: "Code",
-      movie_title: "Movie",
-      showtime_start: "Date",
+      showtime: "Showtime",
       status: "Status",
       seats: "Seats",
     },
@@ -66,7 +65,7 @@ function FormContainer() {
       <Nav justify variant="tabs" defaultActiveKey={activeTab.key}>
         {tabs.map((tab) => (
           <Nav.Item key={tab.key}>
-            <Nav.Link eventKey={tab.key} onClick={() => setActiveTab(tab)}>
+            <Nav.Link eventKey={tab.key} onClick={() => {setActiveTab(tab), setShowForm(false)}}>
               {tab.label}
             </Nav.Link>
           </Nav.Item>
@@ -91,14 +90,14 @@ function FormContainer() {
             {/* Add or close buttons */}
             {showForm ? (
               <Button
-                className="close-button btn"
+                className="close-button btn m-1"
                 onClick={() => setShowForm(false)}
               >
-                Close
+                Cancel
               </Button>
             ) : (
               <Button
-                className="add-button btn btn-success"
+                className="add-button btn btn-success me-5"
                 onClick={() => handleClick(null, "create")}
               >
                 Add

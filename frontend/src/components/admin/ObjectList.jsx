@@ -37,7 +37,7 @@ function ObjectList({ activeTab, handleClick, objectFields }) {
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         // make delete request
         const deleteRes = await api.delete(
-          `admin/manage-${activeTab.key}/${currentDeleteId}/`
+          `admin/${activeTab.key}s/${currentDeleteId}/`
         );
         console.log(deleteRes);
       }
@@ -47,7 +47,6 @@ function ObjectList({ activeTab, handleClick, objectFields }) {
       setPassword("");
       window.location.reload();
     } catch (error) {
-      alert("Invalid password");
       console.error("Error deleting object:", error);
     } finally {
       setLoading(false);
@@ -88,12 +87,13 @@ function ObjectList({ activeTab, handleClick, objectFields }) {
                 {currentDeleteId !== object.id ? (
                   <>
                     <Button
-                      className="me-2"
+                      className="m-1"
                       onClick={() => handleClick(object.id, "update")}
                     >
                       Update
                     </Button>
                     <Button
+                      className="m-1"
                       variant="danger"
                       onClick={() => {
                         setCurrentDeleteId(object.id);
