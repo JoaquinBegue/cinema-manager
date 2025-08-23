@@ -10,11 +10,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import NotFound
 
 # API stuff
-from .models import Movie, Seat, Reservation, Showtime, MOVIE_GENRES
+from .models import Movie, Seat, Reservation, Showtime
 from .serializers import MovieSerializer, SeatSerializer, ReservationSerializer, ShowtimeSerializer
 
 
-# Index. List all movies.
+# List all movies.
 class MovieList(generics.ListAPIView):
     serializer_class = MovieSerializer
     permission_classes = [AllowAny]
@@ -23,12 +23,12 @@ class MovieList(generics.ListAPIView):
         queryset = Movie.objects.all()
         category = self.request.query_params.get("category")
         if category is not None:
-            if category not in MOVIE_GENRES.values():
+            if category not in Movie.MovieGenres.values():
                 raise NotFound("Category not found.")
             queryset = queryset.filter(genre=category)
         return queryset
 
-# Movie page. Get movie info and list all showtimes.
+# Get movie info and list all showtimes.
 class MovieDetails(APIView):
     """Returns data from the requested movie, such as movie info and the available showtimes."""
     permission_classes = [AllowAny]
@@ -62,7 +62,14 @@ class MovieDetails(APIView):
         movie_srl = MovieSerializer(movie)
         return Response({"movie": movie_srl.data, "showtimes": self.get_showtimes(movie)})
 
-# Seat reservation page. List all showtime's seats.
+class MovieGenresList(APIView):
+    """Returns all movie genres."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(Movie.MovieGenres.choices)
+
+# List all showtime's seats.
 class ShowtimeDetails(APIView):
     """Returns info about the requested showtime and its seats."""
     permission_classes = [AllowAny]
@@ -194,8 +201,6 @@ class CancelReservation(APIView):
 
         except Reservation.DoesNotExist:
             raise NotFound("Reservation not found.")
-
-
 
 # List all reservations.
 class ReservationList(generics.ListAPIView):

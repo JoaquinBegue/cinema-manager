@@ -12,6 +12,28 @@ class MovieSerializer(serializers.ModelSerializer):
         model = Movie
         fields = "__all__"
 
+    def validate(self, data):
+        """Validate movie data."""
+        # Validate movie duration.
+        try:
+            data['duration'] = int(data['duration'])
+        except ValueError:
+            raise serializers.ValidationError("Duration must be an integer.")
+
+        if data['duration'] < 1:
+            raise serializers.ValidationError("Duration must be greater than 0.")
+        
+        # Validate movie genre.
+        try:
+            data['genre'] = data['genre'].lower()
+        except ValueError:
+            raise serializers.ValidationError("Genre must be a string.")
+
+        if not data['genre'] in Movie.MovieGenres.values:
+            raise serializers.ValidationError("Invalid genre.")
+
+        return data
+
 
 class SeatSerializer(serializers.ModelSerializer):
     available = serializers.SerializerMethodField()

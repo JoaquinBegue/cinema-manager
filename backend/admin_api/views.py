@@ -14,8 +14,6 @@ from api.serializers import MovieSerializer, ShowtimeSerializer, ReservationSeri
 from auth_api.serializers import UserSerializer
 from api.utils import validate_showtime
 
-TZ_OFFSET = timedelta(hours=3)
-
 class MovieViewSet(ModelViewSet):
     """Manage movies."""
     queryset = Movie.objects.all()
@@ -24,24 +22,15 @@ class MovieViewSet(ModelViewSet):
 
     def create(self, request):
         """Create movie."""
-        # Get data from request
-        title = request.data.get("title")
-        synopsis = request.data.get("synopsis")
-        poster = request.data.get("poster")
-        genre = request.data.get("genre")
-        duration = request.data.get("duration")
-        director = request.data.get("director")
-        cast = request.data.get("cast")
-        trailer_url = request.data.get("trailer_url")
-
-        # Prepare data for serializer
-        data = {'title': title, 'synopsis': synopsis, 'poster': poster, 'genre': genre,
-                'duration': duration, 'director': director, 'cast': cast,
-                'trailer_url': trailer_url}
-
-        # Use serializer for validation and creation
+        # Create a mutable copy of the request data
+        data = request.data.copy()
+        
+        # Handle file upload
+        if 'poster' in request.FILES:
+            data['poster'] = request.FILES['poster']
+        
         serializer = self.get_serializer(data=data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": "Movie created successfully"}, status=201)
 
@@ -128,7 +117,14 @@ class AvailableTimesView(APIView):
         # Get auditorium and datetime from request.
         auditorium = request.query_params.get("auditorium")
         date = request.query_params.get("date")
-        movie_duration = request.query_params.get("movie_duration")
+        movie = request.query_params.get("movie")
+
+        # Get movie duration.
+        try:
+            movie = Movie.objects.get(id=movie)
+        except Movie.DoesNotExist:
+            raise NotFound("Movie not found.")
+        movie_duration = movie.duration
 
         # Convert datetime to datetime object.
         try:

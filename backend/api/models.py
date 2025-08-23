@@ -2,35 +2,28 @@ from datetime import datetime, timedelta
 from django.db import models as m
 from django.contrib.auth.models import User
 
-MOVIE_GENRES = {
-        "action": "Action",
-        "adventure": "Adventure",
-        "animation": "Animation",
-        "comedy": "Comedy",
-        "crime": "Crime",
-        "documentary": "Documentary", 
-        "drama": "Drama",
-        "fantasy": "Fantasy",
-        "horror": "Horror",
-        "romance": "Romance", 
-        "science fiction": "Science Fiction",
-        "thriller": "Thriller", 
-    }
-
-SHOWTIME_STATUS = {
-        "A": "Available",
-        "F": "Full",
-        "E": "Expired"
-    }
-
 MOVIE_TICKET_VALUE = 12
 
 # Create your models here.
 class Movie(m.Model):
+    class MovieGenres(m.TextChoices):
+        ACTION = "action"
+        ADVENTURE = "adventure"
+        ANIMATION = "animation"
+        COMEDY = "comedy"
+        CRIME = "crime"
+        DOCUMENTARY = "documentary"
+        DRAMA = "drama"
+        FANTASY = "fantasy"
+        HORROR = "horror"
+        ROMANCE = "romance"
+        SCIENCE_FICTION = "science fiction"
+        THRILLER = "thriller"
+
     title = m.CharField(max_length=500)
     synopsis = m.CharField(max_length=1000)
     poster = m.ImageField(default="default_poster.jpg", upload_to="images/posters/")
-    genre = m.CharField(max_length=50, choices=MOVIE_GENRES)
+    genre = m.CharField(max_length=50, choices=MovieGenres.choices)
     duration = m.IntegerField(verbose_name="duration in minutes")
     director = m.CharField(max_length=255)
     cast = m.CharField(max_length=2500)
@@ -100,6 +93,11 @@ class Showtime(m.Model):
     - status: a String that represents the showtime's status. It can be either 'available', 'full' or 'expired'.
     """
 
+    SHOWTIME_STATUS = {
+        "A": "Available",
+        "F": "Full",
+        "E": "Expired"
+    }
 
     movie = m.ForeignKey(Movie, related_name="showtimes", on_delete=m.CASCADE)
     auditorium = m.IntegerField()
