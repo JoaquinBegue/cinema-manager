@@ -7,6 +7,7 @@ import { Container, Nav, Button, Row, Col } from "react-bootstrap";
 import ObjectList from "./ObjectList";
 import ShowtimeForm from "./ShowtimeForm";
 import MovieForm from "./MovieForm";
+import ReservationForm from "./ReservationForm";
 
 // Styles
 import "../../styles/Admin.css";
@@ -125,7 +126,14 @@ function FormContainer() {
           selectedObjectId={selectedObjectId} 
           onClose={handleCloseForm}
         />
-      ) : (
+      ) : activeTab.key === "reservation" ? (
+      <ReservationForm 
+        mode={mode} 
+        selectedObjectId={selectedObjectId} 
+        onClose={handleCloseForm}
+      />
+      ) :
+      (
         <p>Not found</p>
       )}
     </Container>
