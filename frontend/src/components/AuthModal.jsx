@@ -44,9 +44,9 @@ function AuthModal({ show: externalShow, onShow, method, onSuccess }) {
       setLoading(false);
       setEmail("");
       setPassword("");
+      setPassword2("");
       setFirstName("");
       setLastName("");
-      setPassword2("");
     }
 
     handleClose();

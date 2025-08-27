@@ -66,7 +66,7 @@ function FormContainer() {
       <Nav justify variant="tabs" defaultActiveKey={activeTab.key}>
         {tabs.map((tab) => (
           <Nav.Item key={tab.key}>
-            <Nav.Link eventKey={tab.key} onClick={() => {setActiveTab(tab), setShowForm(false)}}>
+            <Nav.Link eventKey={tab.key} onClick={() => { setActiveTab(tab), setShowForm(false) }}>
               {tab.label}
             </Nav.Link>
           </Nav.Item>
@@ -92,6 +92,7 @@ function FormContainer() {
             {showForm ? (
               <Button
                 className="close-button btn m-1"
+                variant="danger"
                 onClick={() => setShowForm(false)}
               >
                 Cancel
@@ -115,27 +116,27 @@ function FormContainer() {
           objectFields={objectFields[activeTab.key]}
         />
       ) : activeTab.key === "showtime" ? (
-        <ShowtimeForm 
-          mode={mode} 
-          selectedObjectId={selectedObjectId} 
+        <ShowtimeForm
+          mode={mode}
+          selectedObjectId={selectedObjectId}
           onClose={handleCloseForm}
         />
       ) : activeTab.key === "movie" ? (
-        <MovieForm 
-          mode={mode} 
-          selectedObjectId={selectedObjectId} 
+        <MovieForm
+          mode={mode}
+          selectedObjectId={selectedObjectId}
           onClose={handleCloseForm}
         />
       ) : activeTab.key === "reservation" ? (
-      <ReservationForm 
-        mode={mode} 
-        selectedObjectId={selectedObjectId} 
-        onClose={handleCloseForm}
-      />
+        <ReservationForm
+          mode={mode}
+          selectedObjectId={selectedObjectId}
+          onClose={handleCloseForm}
+        />
       ) :
-      (
-        <p>Not found</p>
-      )}
+        (
+          <p>Not found</p>
+        )}
     </Container>
   );
 }
