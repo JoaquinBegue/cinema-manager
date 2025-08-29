@@ -15,3 +15,9 @@ At the moment, the project is focused on the user experience of making a reserva
 - Payment system.
 - Docker.
 - PostgresSQL.
+
+## Technologies used:
+- Django as backend.
+- Django REST Framework for API.
+- React at frontend.
+- Jason Web Tokens for authentication.
