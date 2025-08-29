@@ -31,6 +31,7 @@ function ObjectList({ activeTab, handleClick, objectFields }) {
     try {
       // Confirm user password and save new tokens.
       const username = localStorage.getItem("username");
+      console.log(username)
       const res = await refreshApi.post("/auth/token/", { username, password });
       if (res.status == 200) {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);

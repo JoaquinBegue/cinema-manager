@@ -67,7 +67,7 @@ class MovieGenresList(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        return Response(Movie.MovieGenres.choices)
+        return Response(Movie.Genre.choices)
 
 # List all showtime's seats.
 class ShowtimeDetails(APIView):

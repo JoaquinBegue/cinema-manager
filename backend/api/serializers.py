@@ -6,14 +6,16 @@ from django.utils import timezone
 from .utils import validate_showtime
 from .models import Movie, Seat, Reservation, Showtime
 
-
 class MovieSerializer(serializers.ModelSerializer):
+    genres = serializers.MultipleChoiceField(choices=Movie.Genre.choices)
+
     class Meta:
         model = Movie
         fields = "__all__"
 
     def validate(self, data):
         """Validate movie data."""
+
         # Validate movie duration.
         try:
             data['duration'] = int(data['duration'])
@@ -22,15 +24,6 @@ class MovieSerializer(serializers.ModelSerializer):
 
         if data['duration'] < 1:
             raise serializers.ValidationError("Duration must be greater than 0.")
-        
-        # Validate movie genre.
-        try:
-            data['genre'] = data['genre'].lower()
-        except ValueError:
-            raise serializers.ValidationError("Genre must be a string.")
-
-        if not data['genre'] in Movie.MovieGenres.values:
-            raise serializers.ValidationError("Invalid genre.")
 
         return data
 

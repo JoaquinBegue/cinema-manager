@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../../api";
+
 import { Form, Button } from "react-bootstrap";
 import LoadingIndicator from "../LoadingIndicator";
+import Select from "react-select";
 
 function MovieForm({ mode, selectedObjectId, onClose }) {
   // General form states.
@@ -22,7 +24,7 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
   const [formData, setFormData] = useState({
     title: "",
     synopsis: "",
-    genre: "",
+    genres: [],
     duration: null,
     director: "",
     cast: "",
@@ -34,7 +36,14 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
     const fetchGenres = async () => {
       try {
         const response = await api.get("/api/movie-genres/");
-        setGenres(response.data);
+        let genres_temp = [];
+        response.data.forEach((genre) => {
+          genres_temp.push({
+            value: genre[0],
+            label: genre[1],
+          });
+        });
+        setGenres(genres_temp);
       } catch (err) {
         setError(err.response?.data?.detail || "Failed to fetch genres");
       }
@@ -49,7 +58,7 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
           setFormData({
             title: movieData.title || "",
             synopsis: movieData.synopsis || "",
-            genre: movieData.genre || "",
+            genres: movieData.genre || [],
             duration: movieData.duration || null,
             director: movieData.director || "",
             cast: movieData.cast || "",
@@ -76,25 +85,33 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleChange = (e, field = null) => {
+    if (field === 'genre') {
+      setFormData(prev => ({
+        ...prev,
+        genres: e
+      }));
+    } else {
+      const { name, value } = e.target;
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   // Validate form data
   useEffect(() => {
-    const { title, synopsis, genre, duration, director, cast, trailer_url } = formData;
-    const isValid = 
-      title.trim() !== "" && 
-      synopsis.trim() !== "" && 
-      genre.trim() !== "" && 
-      duration !== null && 
-      cast.trim() !== null &&
+    const { title, synopsis, genres, duration, director, cast, trailer_url } = formData;
+    const isValid =
+      title.trim() !== "" &&
+      synopsis.trim() !== "" &&
+      genres.length > 0 &&
+      duration !== null &&
+      director.trim() !== "" &&
+      cast.trim() !== "" &&
       trailer_url.trim() !== "";
-    
+
     setValidData(isValid);
   }, [formData]);
 
@@ -106,9 +123,15 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
     // Prepare data to support files.
     const formDataToSend = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      formDataToSend.append(key, value);
+      if (key === "genres") {
+        value.forEach((genre) => {
+          formDataToSend.append("genres[]", genre.value);
+        });
+      } else {
+        formDataToSend.append(key, value);
+      }
     });
-    
+
     if (posterFile) {
       formDataToSend.append('poster', posterFile);
     }
@@ -126,9 +149,9 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
       } else {
         await api.put(`/admin/movies/${selectedObjectId}/`, formDataToSend, { headers });
       }
-      
+
       setSuccess(`Movie ${mode === "create" ? "created" : "updated"} successfully!`);
-      
+
       if (createAnother) {
         // Reset form for next entry
         setFormData({
@@ -167,7 +190,7 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
     <div className="movie-form-container mx-auto p-4">
       {mode === "create" && <h2>Add New Movie</h2>}
       {mode === "update" && <h2>Edit Movie</h2>}
-      
+
       <Form onSubmit={handleSubmit} className="movie-form">
         {/* Title */}
         <Form.Group className="mb-3">
@@ -197,19 +220,14 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
         {/* Genre */}
         <Form.Group className="mb-3">
           <Form.Label>Genre</Form.Label>
-          <Form.Select
+          <Select
+            id="genre"
             name="genre"
-            value={formData.genre}
-            onChange={handleChange}
+            onChange={(selected) => handleChange(selected, 'genre')}
+            options={genres}
+            isMulti
             required
-          >
-            <option value="">Select a genre</option>
-            {genres && Object.values(genres).map((genre) => (
-              <option key={genre[0]} value={genre[0]}>
-                {genre[1]}
-              </option>
-            ))}
-          </Form.Select>
+          />
         </Form.Group>
 
         {/* Duration */}
@@ -275,10 +293,10 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
           />
           {previewUrl && (
             <div className="mt-2">
-              <img 
-                src={previewUrl} 
-                alt="Poster preview" 
-                style={{ maxWidth: '200px', maxHeight: '300px', objectFit: 'contain' }} 
+              <img
+                src={previewUrl}
+                alt="Poster preview"
+                style={{ maxWidth: '200px', maxHeight: '300px', objectFit: 'contain' }}
                 className="img-thumbnail"
               />
             </div>
@@ -289,27 +307,27 @@ function MovieForm({ mode, selectedObjectId, onClose }) {
         {success && <div className="alert alert-success">{success}</div>}
 
         <div className="d-flex gap-2">
-          <Button 
-            variant="success" 
-            type="submit" 
+          <Button
+            variant="success"
+            type="submit"
             disabled={!validData}
           >
             {mode === "create" ? 'Create' : 'Update'} Movie
           </Button>
-          
+
           {mode === "create" && (
-            <Button 
-              variant="primary" 
-              type="submit" 
+            <Button
+              variant="primary"
+              type="submit"
               disabled={!validData}
               onClick={() => setCreateAnother(true)}
             >
               {mode === "create" ? 'Create & Add Another' : 'Update'}
             </Button>
           )}
-          
-          <Button 
-            variant="secondary" 
+
+          <Button
+            variant="secondary"
             onClick={onClose}
           >
             Cancel

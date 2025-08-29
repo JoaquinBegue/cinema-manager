@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
 import api from "../../api";
-import { Form, Button } from "react-bootstrap";
+import { useEffect, useState } from "react";
+
+import { Form, Button, Container } from "react-bootstrap";
+import LoadingIndicator from "../LoadingIndicator";
+
+import Select from "react-select";
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import LoadingIndicator from "../LoadingIndicator";
-import "./ShowtimeForm.css";
+
+import "../../styles/ShowtimeForm.css";
 
 function ShowtimeForm({ mode, selectedObjectId, onClose }) {
   // General form states.
@@ -17,10 +22,10 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
   const [fetchingTimes, setFetchingTimes] = useState(false);
   const [noTimesAvailable, setNoTimesAvailable] = useState(false);
   const [newDateSelected, setNewDateSelected] = useState(false);
-  
+
   // Display states.
   const [movies, setMovies] = useState([]);
-  const auditoriums = [1, 2, 3, 4, 5];
+  const auditoriums = [{ value: 1, label: 1 }, { value: 2, label: 2 }, { value: 3, label: 3 }, { value: 4, label: 4 }, { value: 5, label: 5 }];
   const [availableTimes, setAvailableTimes] = useState([]);
 
   // Form data.
@@ -36,7 +41,15 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
     const fetchMovies = async () => {
       try {
         const response = await api.get(`/admin/movies/`);
-        setMovies(response.data);
+        let movies_temp = [];
+        response.data.forEach((movie) => {
+          movies_temp.push({
+            value: movie.id,
+            label: movie.title,
+            duration: movie.duration,
+          });
+        });
+        setMovies(movies_temp);
       } catch (err) {
         setError(err.response?.data?.detail || "Failed to fetch movies");
       }
@@ -103,23 +116,33 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
     );
   };
 
-  const handleChange = (e) => {
-    try {
-      const { name, value } = e.target;
-      const time = name === "time" ? value : "";
+  const handleChange = (e, field) => {
+    console.log(e)
+    if (field === 'date') {
       setFormData(prev => ({
         ...prev,
-        [name]: value,
-        ["time"]: time
-      }));
-    }
-    catch (err) {
-      setFormData(prev => ({
-        ...prev,
-        ["date"]: e,
-        ["time"]: ""
+        date: e,
+        time: null
       }));
       setNewDateSelected(true);
+    } else if (field === 'movie' || field === 'auditorium') {
+      setFormData(prev => ({
+        ...prev,
+        [field]: e ? e.value : null,
+        time: null
+      }));
+    } else if (field === 'time') {
+      setFormData(prev => ({
+        ...prev,
+        time: e ? e.target.value : null
+      }));
+    } else {
+      // Handle regular input fields
+      const { name, value } = e.target;
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
   };
 
@@ -151,9 +174,9 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
       } else {
         await api.put(`/admin/showtimes/${selectedObjectId}/`, formData, { headers });
       }
-      
+
       setSuccess(`Showtime ${mode === "create" ? "created" : "updated"} successfully!`);
-      
+
       if (createAnother) {
         // Reset form for next entry
         setFormData({
@@ -168,7 +191,7 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
         setCreateAnother(false);
         setError(null);
         setSuccess(null);
-        
+
         // Reset form inputs
         const form = document.querySelector('.showtime-form');
         if (form) {
@@ -193,40 +216,27 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
       <Form onSubmit={handleSubmit} className="showtime-form">
         {/* Movie selector */}
         <div className="form-group">
-          <label htmlFor="movie">Movie</label>
-          <select
+          <Form.Label htmlFor="movie">Movie</Form.Label>
+          <Select
             id="movie"
             name="movie"
-            value={formData.movie}
-            onChange={handleChange}
+            onChange={(selected) => handleChange(selected, 'movie')}
+            options={movies}
             required
-          >
-            <option value="">Select a movie</option>
-            {movies.map((movie) => (
-              <option key={movie.id} value={movie.id}>
-                {movie.title}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         {/* Auditorium selector */}
         <div className="form-group">
-          <label htmlFor="auditorium">Auditorium</label>
-          <select
+          <Form.Label htmlFor="auditorium">Auditorium</Form.Label>
+          <Select
             id="auditorium"
             name="auditorium"
-            value={formData.auditorium}
-            onChange={handleChange}
+            onChange={(selected) => handleChange(selected, 'auditorium')}
+            options={auditoriums}
+            isSearchable={false}
             required
-          >
-            <option value=""></option>
-            {auditoriums.map((auditorium) => (
-              <option key={auditorium} value={auditorium}>
-                {auditorium}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         {/* Date picker */}
@@ -237,7 +247,7 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
             name="start-date"
             inline
             selected={formData.date}
-            onChange={handleChange}
+            onChange={(date) => handleChange(date, 'date')}
             dateFormat="yyyy-MM-dd"
             className="date-picker"
             filterDate={filterDate}
@@ -245,14 +255,14 @@ function ShowtimeForm({ mode, selectedObjectId, onClose }) {
         </div>
 
         {/* Time selector */}
-        {formData.date && formData.auditorium && formData.movie && !fetchingTimes && !noTimesAvailable && newDateSelected &&(
+        {formData.date && formData.auditorium && formData.movie && !fetchingTimes && !noTimesAvailable && newDateSelected && (
           <div className="form-group">
             <label htmlFor="time">Time</label>
             <select
               id="time"
               name="time"
-              value={formData.time}
-              onChange={handleChange}
+              value={formData.time || ''}
+              onChange={(e) => handleChange(e, 'time')}
               size={10}
               required
             >

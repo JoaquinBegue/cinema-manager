@@ -1,25 +1,20 @@
-TODO: Main
-- let the admin user input json data to create multiple objects
+GENERAL:
+    - Let the admin user input json data to create multiple objects.
+    - Implement the operations tab in the admin page.
+        - Create "Operation" model.
+        - Update views to register operations made.
+    - Add reservations page.
+    - Add pagination to object listing in admin page.
+    - Add filtering and sorting to Showtime listing in admin page.
 
-- Change showtime form's select movie field for a search bar.
-    - Move search bar from navbar to a separate component and use it in showtime form.
+BACKEND:
 
-- Display an alert in the operations tab when updating or deleting an object.
-
-- Create a new "Operation" model to store all operations.
-    - Update views to create operations.
-
-- Fix reservation status auto updating.
-
-- Add loading indicators to:
-    - Components that rely on user authentication status.
-    - Checkout page.
-
-- Fix multiple requesting.
-
-- Add user and mail checking when registering.
-
-Big and complex:
-- 4. Include email system (When creation an account and making reservations).
-- 5. Add admin page.
-- 6. Add payment system.
+FRONTEND:
+    - Fix movie display at home page.
+    - Fix display of auth modal.
+    - Fix display of seat selector.
+    - Add loading indicators.
+    - Add notifications:
+        - Error message on wrong credentials at deleting an object.
+        - Success message when creating, updating or deleting an object, at the operations tab.
+        

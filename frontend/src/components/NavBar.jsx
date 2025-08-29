@@ -1,12 +1,12 @@
 // Import necessary components from react-bootstrap
-import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import { useState, useEffect } from "react";
-import AuthModal from "./AuthModal";
 import api from "../api";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { Container, Form, Nav, Navbar } from "react-bootstrap";
+import AuthModal from "./AuthModal";
+import SearchBar from "./SearchBar";
+
 import "../styles/NavBar.css";
 
 /**
@@ -19,9 +19,6 @@ function NavBar({ page }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMethod, setAuthMethod] = useState("login");
   // Search bar related.
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
   const [movies, setMovies] = useState([]);
 
   const navigate = useNavigate();
@@ -35,27 +32,20 @@ function NavBar({ page }) {
     getMovies();
   }, []);
 
-  const searchMovies = (searchQuery) => {
-    setSearchQuery(searchQuery);
-    if (searchQuery.length > 2) {
-      let results = movies.filter((movie) =>
-        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setSearchResults(results);
-      setShowResults(true);
-    } else {
-      setSearchResults([]);
-      setShowResults(false);
-    }
-  };
-
   // Function to fetch movies from the API
   const getMovies = () => {
     const res = api
       .get("/api/movies/")
       .then((res) => res.data)
       .then((data) => {
-        setMovies(data); // Update movies state with fetched data
+        let movies_temp = [];
+        data.forEach((movie) => {
+          movies_temp.push({
+            id: movie.id,
+            label: movie.title,
+          });
+        });
+        setMovies(movies_temp); // Update movies state with fetched data
       })
       .catch((err) => alert(err)); // Show alert if there's an error
   };
@@ -110,37 +100,7 @@ function NavBar({ page }) {
               <h1 className="brand-logo my-0">CINEMA</h1>
             </Navbar.Brand>
             {/* Search form with dropdown */}
-            <Form className="navbar-right d-flex position-relative">
-              <Form.Control
-                type="search"
-                placeholder="Search movies..."
-                className="ms-auto me-2 w-75"
-                aria-label="Search"
-                value={searchQuery}
-                onChange={(e) => searchMovies(e.target.value)}
-                onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && searchResults.length > 0) {
-                    e.preventDefault();
-                    handleMovieClick(searchResults[0].id);
-                  }
-                }}
-              />
-              {/* Search results dropdown */}
-              {showResults && searchResults.length > 0 && (
-                <div className="search-results-dropdown ms-auto me-2">
-                  {searchResults.map((movie) => (
-                    <div
-                      key={movie.id}
-                      className="search-result-item"
-                      onClick={() => handleMovieClick(movie.id)}
-                    >
-                      {movie.title}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Form>
+            <SearchBar className="navbar-right d-flex position-relative search-bar" placeholder="Search movies..." objects={movies} handleSelection={handleMovieClick} />
           </Navbar.Collapse>
         </Container>
       </Navbar>

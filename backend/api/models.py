@@ -1,12 +1,13 @@
 from datetime import datetime, timedelta
 from django.db import models as m
 from django.contrib.auth.models import User
+from multiselectfield import MultiSelectField
 
 MOVIE_TICKET_VALUE = 12
 
 # Create your models here.
 class Movie(m.Model):
-    class MovieGenres(m.TextChoices):
+    class Genre(m.TextChoices):
         ACTION = "action"
         ADVENTURE = "adventure"
         ANIMATION = "animation"
@@ -22,8 +23,8 @@ class Movie(m.Model):
 
     title = m.CharField(max_length=500)
     synopsis = m.CharField(max_length=1000)
-    poster = m.ImageField(default="default_poster.jpg", upload_to="images/posters/")
-    genre = m.CharField(max_length=50, choices=MovieGenres.choices)
+    poster = m.ImageField(default="default_poster.jpg", upload_to="images/posters/", null=True)
+    genres = MultiSelectField(choices=Genre, blank=True)
     duration = m.IntegerField(verbose_name="duration in minutes")
     director = m.CharField(max_length=255)
     cast = m.CharField(max_length=2500)

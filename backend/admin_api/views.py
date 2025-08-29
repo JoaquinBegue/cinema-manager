@@ -6,8 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
-
+from rest_framework.exceptions import ParseError, APIException
 
 from api.models import Movie, Showtime, Reservation, User
 from api.serializers import MovieSerializer, ShowtimeSerializer, ReservationSerializer
@@ -28,11 +27,14 @@ class MovieViewSet(ModelViewSet):
         # Handle file upload
         if 'poster' in request.FILES:
             data['poster'] = request.FILES['poster']
-        
+
         serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"message": "Movie created successfully"}, status=201)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({"message": "Movie created successfully"}, status=201)
+        
+        return Response(serializer.errors, status=400)
+
 
 class ShowtimeViewSet(ModelViewSet):
     """Manage showtimes."""
@@ -43,59 +45,54 @@ class ShowtimeViewSet(ModelViewSet):
     def create(self, request):
         """Create showtime."""
         # Get data from request
-        movie_id = request.data.get("movie")
-        auditorium = request.data.get("auditorium")
-        date = request.data.get("date")
-        time = request.data.get("time")
+        data = request.data.copy()
+        date = data.pop("date")
+        time = data.pop("time")
 
         # Parse date and time
         try:
             date_obj = datetime.fromisoformat(date).date()
         except ValueError:
-            raise NotFound("Invalid datetime format.")
+            raise ParseError("Invalid datetime format.")
         
         # Create showtime start datetime
-        start = datetime(date_obj.year, date_obj.month, date_obj.day,
+        data["start"] = datetime(date_obj.year, date_obj.month, date_obj.day,
             int(time.split(":")[0]), int(time.split(":")[1]))
-
-        # Prepare data for serializer
-        data = {'movie': movie_id, 'auditorium': auditorium, 'start': start}
 
         # Use serializer for validation and creation
         serializer = self.get_serializer(data=data)
-        serializer.is_valid()
-        serializer.save()
-        return Response({"message": "Showtime created successfully"}, status=201)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Showtime created successfully"}, status=201)
+
+        return Response(serializer.errors, status=400)
 
 
     def update(self, request, pk=None):
         """Update showtime."""
         # Get data from request
         showtime = self.get_object()
-        movie_id = request.data.get("movie")
-        auditorium = request.data.get("auditorium")
-        date = request.data.get("date")
-        time = request.data.get("time")
+        data = request.data.copy()
+        date = data.pop("date")
+        time = data.pop("time")
 
         # Parse date and time
         try:
             date_obj = datetime.fromisoformat(date).date()
         except ValueError:
-            raise NotFound("Invalid datetime format.")
+            raise ParseError("Invalid datetime format.")
         
         # Create showtime start datetime
-        start = datetime(date_obj.year, date_obj.month, date_obj.day,
+        data["start"] = datetime(date_obj.year, date_obj.month, date_obj.day,
             int(time.split(":")[0]), int(time.split(":")[1]))
-
-        # Prepare data for serializer
-        data = {'movie': movie_id, 'auditorium': auditorium, 'start': start}
 
         # Use serializer for validation and creation
         serializer = self.get_serializer(showtime, data=data)
-        serializer.is_valid()
-        serializer.save()
-
-        return Response({"message": "Showtime updated successfully"}, status=200)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Showtime updated successfully"}, status=200)
+        
+        return Response(serializer.errors, status=400)
 
 class ReservationViewSet(ModelViewSet):
     """Manage reservations."""
@@ -123,7 +120,7 @@ class AvailableTimesView(APIView):
         try:
             movie = Movie.objects.get(id=movie)
         except Movie.DoesNotExist:
-            raise NotFound("Movie not found.")
+            return Response({"error": "Movie not found"}, status=400)
         movie_duration = movie.duration
 
         # Convert datetime to datetime object.
