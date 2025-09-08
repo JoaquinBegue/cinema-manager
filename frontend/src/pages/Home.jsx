@@ -1,7 +1,7 @@
 // This page displays all the movies for the user to browse.
 
 // Base imports.
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import api from "../api";
 
 // Components
@@ -33,10 +33,17 @@ function Home() {
       .catch((err) => alert(err)); // Show alert if there's an error
   };
 
+  const searchBarMovies = useMemo(() => {
+    return movies.map((movie) => ({
+      id: movie.id,
+      label: movie.title,
+    }));
+  }, [movies]);
+
   return (
     <>
       {/* Navigation bar component with "home" page indicator */}
-      <NavBar page="home" />
+      <NavBar page="home" movies={searchBarMovies} />
 
       <div className="movies">
         {/* Create a grid with 5 columns on large screens */}

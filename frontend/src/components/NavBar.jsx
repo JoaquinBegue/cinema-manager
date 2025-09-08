@@ -14,12 +14,10 @@ import "../styles/NavBar.css";
  * @param {Object} props - Component props
  * @param {string} props.page - Current page identifier
  */
-function NavBar({ page }) {
+function NavBar({ page, movies = [] }) {
   // Auth modal related.
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMethod, setAuthMethod] = useState("login");
-  // Search bar related.
-  const [movies, setMovies] = useState([]);
 
   const navigate = useNavigate();
 
@@ -28,27 +26,6 @@ function NavBar({ page }) {
     setShowAuthModal(true);
   };
 
-  useEffect(() => {
-    getMovies();
-  }, []);
-
-  // Function to fetch movies from the API
-  const getMovies = () => {
-    const res = api
-      .get("/api/movies/")
-      .then((res) => res.data)
-      .then((data) => {
-        let movies_temp = [];
-        data.forEach((movie) => {
-          movies_temp.push({
-            id: movie.id,
-            label: movie.title,
-          });
-        });
-        setMovies(movies_temp); // Update movies state with fetched data
-      })
-      .catch((err) => alert(err)); // Show alert if there's an error
-  };
 
   const handleMovieClick = (movieId) => {
     navigate(`/movie/${movieId}`);
